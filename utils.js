@@ -15,14 +15,14 @@ module.exports = {
     }
   },
 
-  guardReply: async function(interaction) {
-    let userId = interaction.user.id;
+  guardReply: async function(interaction, userId) {
+    let matchId = userId ? userId : interaction.user.id;
     let customId = interaction.customId;
-    if (customId.endsWith(userId)) {
+    if (customId.endsWith(matchId)) {
       return true;
     } else {
       await interaction.reply({
-        content: "This button is not for you",
+        content: "You are not worthy.",
         ephemeral: true
       })
       return false;

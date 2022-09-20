@@ -1,50 +1,87 @@
-const { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { guardReply } = require('../utils');
+const { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, TextInputBuilder, MessageActionRow } = require('discord.js');
+const { guardReply } = require('../utils.js');
+const systems = require('../systems.js')
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('request-nickname')
-		.setDescription('Request approval for a new nickname. Approval must be from nobility.'),
+		.setDescription('Request approval for a new nickname. Approval must be from nobility.')
+		.addStringOption(option => 
+			option.setName("nickname")
+				.setDescription("Your desired new name.")
+				.setRequired(true)),
 	async execute(interaction) {
-		const requestingUser = interaction.member.displayName;
-		let options = [];
-		const higherPositions = interaction.guild.roles.cache.filter(role => {
-			return interaction.member.roles.highest.comparePositionTo(role) <= 0;
-		}).toJSON();
-		for (let role of higherPositions) {
-			options.push({
-				label: role.name,
-				value: role.id,
-			})
+		const displayName = interaction.member.displayName;
+		const options = await fetchApprovers(interaction);
+		const approverRow = new ActionRowBuilder()
+			.addComponents(new SelectMenuBuilder()
+				.setCustomId(`nickname-approver-${interaction.user.id}`)
+				.setPlaceholder('Who shall you beseech?')
+				.addOptions(...options)
+			)
+		const submitRow = new ActionRowBuilder()
+			.addComponents(new ButtonBuilder()
+				.setCustomId(`approval-request-submit-${interaction.user.id}`)
+				.setLabel("Submit Request")
+				.setStyle(ButtonStyle.Primary)
+			)
+		await interaction.reply({ content: `${displayName} is begging to change their name to ${interaction.options.getString("nickname")}!`, components: [approverRow, submitRow] });
+		const user = {
+			displayName: displayName,
+			id: interaction.user.id
 		}
-    const row = new ActionRowBuilder()
-			.addComponents(
-				new SelectMenuBuilder()
-					.setCustomId(`nickname-approver-${interaction.user.id}`)
-					.setPlaceholder('Nothing selected')
-					.addOptions(...options),
-			);
-		await interaction.reply({ content: 'Request Approval From:', components: [row] });
-		createApprovalButton(interaction, requestingUser);
+		createApprovalButton(interaction, user);
 	},
 };
 
-createApprovalButton = function(interaction, requestingUser) {
-	interaction.client.once("interactionCreate", async interaction => {
-		if (!interaction.isSelectMenu()) return;
-		if (!guardReply(interaction)) return;
+fetchApprovers = async function(interaction) {
+	const options = [];
+	const higherRoles = interaction.guild.roles.cache.filter(role => {
+		return interaction.member.roles.highest.comparePositionTo(role) <= 0;
+	}).toJSON();
+	const members = await interaction.guild.members.fetch();
+	const approvers = members.filter(member => {
+		return higherRoles.some(higherRole => member.roles.cache.find(role => role.name === higherRole.name))
+	}).toJSON();
+	for (let member of approvers) {
+		options.push({
+			label: member.displayName ? member.displayName : member.user.username,
+			value: member.user.id
+		})
+	}
+	return options;
+}
 
+createApprovalButton = function(interaction, user) {
+	systems.awaitCustomEventById(interaction.client, "approval-request-submit", user.id, async i => {
 		const row = new ActionRowBuilder()
 			.addComponents(
 				new ButtonBuilder()
-					.setCustomId(`nickname-approval-${interaction.user.id}`)
+					.setCustomId(`nickname-approval-${i.user.id}`)
 					.setLabel("Approve")
 					.setStyle(ButtonStyle.Primary)
 			)
 
-		await interaction.reply({
-			content: `Approve @${requestingUser}'s Request?`,
+		await i.reply({
+			content: `Approve @${user.displayName}'s Request?`,
 			components: [row]
 		})
 	})
+	// interaction.client.once("interactionCreate", async interaction => {
+	// 	if (!interaction.isSelectMenu()) return;
+	// 	if (!guardReply(interaction)) return;
+
+	// 	const row = new ActionRowBuilder()
+	// 		.addComponents(
+	// 			new ButtonBuilder()
+	// 				.setCustomId(`nickname-approval-${interaction.user.id}`)
+	// 				.setLabel("Approve")
+	// 				.setStyle(ButtonStyle.Primary)
+	// 		)
+
+	// 	await interaction.reply({
+	// 		content: `Approve @${user.displayName}'s Request?`,
+	// 		components: [row]
+	// 	})
+	// })
 }

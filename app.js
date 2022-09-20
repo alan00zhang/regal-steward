@@ -3,7 +3,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { getCommands } = require('./utils')
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMembers] });
 getCommands(client);
 
 // When the client is ready, run this code (only once)
@@ -22,6 +22,7 @@ client.on('interactionCreate', async interaction => {
 	} catch (error) {
 		console.error(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		// throw new Error(error.message)
 	}
 });
 
