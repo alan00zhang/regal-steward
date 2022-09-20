@@ -1,0 +1,1 @@
+This discord bot serves as a faithful steward to those residing in the same server.
