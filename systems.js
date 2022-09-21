@@ -8,13 +8,15 @@ module.exports = {
       if (interaction.customId === `${eventName}-${customId}`) { // must match a syntax such as approval-request-submit-288455203840196608
         try {
           eventFn(interaction); // TODO: add optional args and change {eventFn, args} into an object param
-          console.log("it worked!")
         } catch (error) {
           throw new Error(`Custom interaction event failed to fire.
           EventFn: ${eventFn}`);
         } finally {
           customEE.removeListener("interactionCreate", interactionFn)
         }
+        setInterval(() => {
+          customEE.removeListener("interactionCreate", interactionFn);
+        }, duration);
       } else {
         return;
       }

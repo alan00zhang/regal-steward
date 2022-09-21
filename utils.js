@@ -18,7 +18,7 @@ module.exports = {
   guardReply: async function(interaction, userId) {
     let matchId = userId ? userId : interaction.user.id;
     let customId = interaction.customId;
-    if (customId.endsWith(matchId)) {
+    if (!customId.endsWith(matchId)) {
       return true;
     } else {
       await interaction.reply({
@@ -27,5 +27,17 @@ module.exports = {
       })
       return false;
     }
+  },
+
+  time: {
+    MINUTE15: 1000 * 60 * 15,
+    MINUTE30: 1000 * 60 * 30,
+    HOUR1: 1000 * 60 * 60,
+    HOUR2: 1000 * 60 * 60 * 2,
+    HOUR4: 1000 * 60 * 60 * 4,
+    HOUR8: 1000 * 60 * 60 * 8,
+    DAY1: 1000 * 60 * 60 * 24,
+    DAY3: 1000 * 60 * 60 * 24 * 3,
+    WEEK1: 1000 * 60 * 60 * 24 * 7,
   }
 }

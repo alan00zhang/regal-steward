@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, TextInputBuilder, MessageActionRow } = require('discord.js');
-const { guardReply } = require('../utils.js');
+const { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const utils = require('../utils.js');
 const systems = require('../systems.js')
 
 module.exports = {
@@ -25,6 +25,20 @@ module.exports = {
 				.setLabel("Submit Request")
 				.setStyle(ButtonStyle.Primary)
 			)
+		const collector = interaction.channel.createMessageComponentCollector({ componentType: ComponentType.SelectMenu, time: utils.time.HOUR1 });
+		collector.on('collect', i => {
+			if (i.customId.startsWith(`nickname-approver`)) {
+				if (utils.guardReply(i)) {
+					
+				}
+			} else {
+				i.deferUpdate();
+			}
+		});
+		
+		collector.on('end', collected => {
+			console.log(`Collected ${collected.size} interactions.`);
+		});
 		await interaction.reply({ content: `${displayName} is begging to change their name to ${interaction.options.getString("nickname")}!`, components: [approverRow, submitRow] });
 		const user = {
 			displayName: displayName,
@@ -67,21 +81,4 @@ createApprovalButton = function(interaction, user) {
 			components: [row]
 		})
 	})
-	// interaction.client.once("interactionCreate", async interaction => {
-	// 	if (!interaction.isSelectMenu()) return;
-	// 	if (!guardReply(interaction)) return;
-
-	// 	const row = new ActionRowBuilder()
-	// 		.addComponents(
-	// 			new ButtonBuilder()
-	// 				.setCustomId(`nickname-approval-${interaction.user.id}`)
-	// 				.setLabel("Approve")
-	// 				.setStyle(ButtonStyle.Primary)
-	// 		)
-
-	// 	await interaction.reply({
-	// 		content: `Approve @${user.displayName}'s Request?`,
-	// 		components: [row]
-	// 	})
-	// })
 }
