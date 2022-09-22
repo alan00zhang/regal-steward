@@ -15,10 +15,12 @@ module.exports = {
     }
   },
 
-  guardReply: async function(interaction, userId) {
-    let matchId = userId ? userId : interaction.user.id;
+  guardReply: async function(interaction, matchId) {
+    // if matchId is not specified, the guard will reject interactions that are not related to the interacting user
+    // ie. the customId does not match the interacting user id.
+    let userId = matchId ? matchId : interaction.user.id;
     let customId = interaction.customId;
-    if (!customId.endsWith(matchId)) {
+    if (customId.endsWith(userId)) {
       return true;
     } else {
       await interaction.reply({
@@ -29,7 +31,7 @@ module.exports = {
     }
   },
 
-  time: {
+  Time: {
     MINUTE15: 1000 * 60 * 15,
     MINUTE30: 1000 * 60 * 30,
     HOUR1: 1000 * 60 * 60,

@@ -1,9 +1,15 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const { getCommands } = require('./utils')
+const intents = [
+	GatewayIntentBits.Guilds,
+	GatewayIntentBits.GuildMessages,
+	GatewayIntentBits.DirectMessages,
+	GatewayIntentBits.GuildMembers,
+]
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildMembers] });
+const client = new Client({ intents: intents });
 getCommands(client);
 
 // When the client is ready, run this code (only once)
@@ -13,7 +19,6 @@ client.once('ready', () => {
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
-	console.log(interaction.commandName)
 	const command = interaction.client.commands.get(interaction.commandName);
 	if (!command) return;
 	
