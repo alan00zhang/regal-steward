@@ -31,6 +31,20 @@ module.exports = {
     }
   },
 
+  initSingletonCommand: function(interaction, system) {
+    const eventId = `${interaction.commandName}-${interaction.user.id}`;
+		if (system.dbActiveEvents.getById(eventId)) {
+			interaction.reply({
+				content: `You can only have one !${interaction.commandName} command open at once.`,
+				ephemeral: true
+			});
+			return false;
+		} else {
+			system.dbActiveEvents.store(eventId);
+      return eventId;
+		}
+  },
+
   Time: {
     MINUTE15: 1000 * 60 * 15,
     MINUTE30: 1000 * 60 * 30,
