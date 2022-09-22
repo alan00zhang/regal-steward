@@ -1,4 +1,5 @@
 require('dotenv').config({path: __dirname});
+const systemsJs = require('./systems.js');
 const { Client, GatewayIntentBits } = require('discord.js');
 const { getCommands } = require('./utils')
 const intents = [
@@ -10,6 +11,8 @@ const intents = [
 
 // Create a new client instance
 const client = new Client({ intents: intents });
+// Use the system singleton in systemsJs so other files can use the same system without forming circular dependencies
+const system = systemsJs.system.attachClient(client);
 getCommands(client);
 
 // When the client is ready, run this code (only once)
@@ -23,11 +26,10 @@ client.on('interactionCreate', async interaction => {
 	if (!command) return;
 	
 	try {
-		await command.execute(interaction);
+		await command.execute(interaction, system);
 	} catch (error) {
-		console.error(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-		// throw new Error(error.message)
+		throw new Error(error.message)
 	}
 });
 

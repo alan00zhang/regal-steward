@@ -1,6 +1,88 @@
 const { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const utils = require('../utils.js');
-const systems = require('../systems.js');
+const systemsJs = require('../systems.js');
+
+fetchApprovers = async function(interaction) {
+	// find roles higher than the user's
+	const options = [];
+	const higherRoles = interaction.guild.roles.cache.filter(role => {
+		return interaction.member.roles.highest.comparePositionTo(role) <= 0;
+	}).toJSON();
+
+	// find members with any of the higher roles
+	const members = await interaction.guild.members.fetch();
+	const approvers = members.filter(member => {
+		return higherRoles.some(higherRole => member.roles.cache.find(role => role.name === higherRole.name))
+	}).toJSON();
+	for (let member of approvers) {
+		options.push({
+			label: member.displayName ? member.displayName : member.user.username,
+			value: member.user.id
+		})
+	}
+
+	// return higher members
+	return options;
+}
+
+createApprovalListener = function(interaction, user, collector) {
+	const eventFn = async i => {
+		collector.stop();
+
+		const approverId = collector.collected.last().values[0];
+		const approver = await i.guild.members.fetch(approverId);
+
+		// construct ActionRow with Approve and Reject buttons
+		const row = new ActionRowBuilder()
+			.addComponents(
+				new ButtonBuilder()
+					.setCustomId(`nickname-approval-${approverId}`)
+					.setLabel("Approve")
+					.setStyle(ButtonStyle.Primary)
+			)
+
+			.addComponents(
+				new ButtonBuilder()
+					.setCustomId(`nickname-rejection-${approverId}`)
+					.setLabel("Reject")
+					.setStyle(ButtonStyle.Danger)
+			)
+
+		await i.reply({
+			content: `${approver.user.username} Approve @${user.displayName}'s Request?`,
+			components: [row]
+		})
+
+		// wait for approval/rejection
+		processRequest(i, approverId, user.id, interaction.options.getString("nickname"))
+	}
+	const eventOptions = systemsJs.createEventOptions("approval-request-submit", user.id, eventFn, utils.Time.MINUTE15, user.id);
+	const	commandId = `request-nickname-${user.id}`;
+	return systemsJs.awaitCustomEventById(interaction.client, eventOptions, commandId)
+}
+
+processRequest = function(interaction, approverId, beggarId, nickname) {
+	const eventFn = async i => {
+		const [approver, beggar] = await Promise.all([i.guild.members.fetch(approverId), i.guild.members.fetch(beggarId)])
+		let isApproved = i.customId.includes("approval") ? true : false;
+		let content = `<@${approverId}> has ${isApproved ? "approved" : "rejected"} the supplicant <@${beggarId}>'s request!`;
+		if (isApproved) {
+			content += `\n${beggar.displayName ? beggar.displayName : beggar.user.username } will be renamed to ${nickname}`;
+			try {
+				beggar.setNickname(nickname);
+			} catch (error) {
+				console.error(error);
+			}
+		}
+		i.reply({
+			content: content,
+			ephemeral: true
+		})
+	}
+	const eventOptions = systemsJs.createEventOptions([`nickname-approval`, `nickname-rejection`], approverId, eventFn, utils.Time.DAY1, approverId)
+	const	commandId = `request-nickname-${beggarId}`;
+	systemsJs.awaitCustomEventById(interaction.client, eventOptions, commandId);
+}
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -11,7 +93,9 @@ module.exports = {
 				.setDescription("Your desired new name.")
 				.setRequired(true)),
 
-	async execute(interaction) {
+	async execute(interaction, system) {
+		const commandId = utils.initSingletonCommand(interaction, system)
+		if (!commandId) return;
 		const displayName = interaction.member.displayName;
 		const options = await fetchApprovers(interaction);
 
@@ -23,7 +107,7 @@ module.exports = {
 				.addOptions(...options)
 			)
 
-		// construct Action Row for submitting the request to the selected member
+		// construct ActionRow for submitting the request to the selected member
 		const submitRow = new ActionRowBuilder()
 			.addComponents(new ButtonBuilder()
 				.setCustomId(`approval-request-submit-${interaction.user.id}`)
@@ -33,16 +117,19 @@ module.exports = {
 
 		// create an InteractionCollector that watches and updates the dropdown menu whenever an option is selected,
 		// also updates the message with the Submit Request button
-		const collector = interaction.channel.createMessageComponentCollector({ componentType: ComponentType.SelectMenu, time: utils.Time.HOUR1 });
+		const collector = interaction.channel.createMessageComponentCollector({ componentType: ComponentType.SelectMenu, time: utils.Time.DAY1 });
 		let listener;
+		let listenSuccess = false;
 		collector.on('collect', async i => {
 			if (i.customId.startsWith(`nickname-approver`)) {
 				if (utils.guardReply(i)) {
+					// display the clicked option as the selected value
 					const userId = i.values[0];
 					let newOptions = structuredClone(options)
 					let selectedOption = newOptions.find(option => option.value === userId)
 					selectedOption.default = true;
 
+					// reconstruct the select menu, this time updating the selected value 
 					const updatedSelectMenu = new ActionRowBuilder()
 						.addComponents(new SelectMenuBuilder()
 							.setCustomId(`nickname-approver-${interaction.user.id}`)
@@ -63,79 +150,18 @@ module.exports = {
 				}
 			} else if (i.customId.startsWith(`approval-request-submit`)) {
 				if (utils.guardReply(i)) {
-					collector.end();
+					listenSuccess = true;
+					collector.stop();
 				}
 			} else {
 				i.deferReply();
 			}
 		});
 
+		collector.on('end', collected => {
+			if (!listenSuccess) system.dbActiveEvents.removeById(commandId);
+		});
+
 		await interaction.reply({ content: `${displayName} is begging to change their name to ${interaction.options.getString("nickname")}!`, components: [approverRow] });
 	},
 };
-
-fetchApprovers = async function(interaction) {
-	const options = [];
-	const higherRoles = interaction.guild.roles.cache.filter(role => {
-		return interaction.member.roles.highest.comparePositionTo(role) <= 0;
-	}).toJSON();
-	const members = await interaction.guild.members.fetch();
-	const approvers = members.filter(member => {
-		return higherRoles.some(higherRole => member.roles.cache.find(role => role.name === higherRole.name))
-	}).toJSON();
-	for (let member of approvers) {
-		options.push({
-			label: member.displayName ? member.displayName : member.user.username,
-			value: member.user.id
-		})
-	}
-	return options;
-}
-
-createApprovalListener = function(interaction, user, collector) {
-	const eventFn = async i => {
-		collector.stop();
-		const approverId = collector.collected.last().values[0];
-		const approver = await i.guild.members.fetch(approverId);
-		const row = new ActionRowBuilder()
-			.addComponents(
-				new ButtonBuilder()
-					.setCustomId(`nickname-approval-${approverId}`)
-					.setLabel("Approve")
-					.setStyle(ButtonStyle.Primary)
-			)
-
-			.addComponents(
-				new ButtonBuilder()
-					.setCustomId(`nickname-rejection-${approverId}`)
-					.setLabel("Reject")
-					.setStyle(ButtonStyle.Danger)
-			)
-
-		await i.reply({
-			content: `${approver.user.username} Approve @${user.displayName}'s Request?`,
-			components: [row]
-		})
-		processRequest(i, approverId, user.id, interaction.options.getString("nickname"))
-	}
-	const eventOptions = systems.createEventOptions("approval-request-submit", user.id, eventFn, utils.Time.MINUTE15, user.id);
-	return systems.awaitCustomEventById(interaction.client, eventOptions)
-}
-
-processRequest = function(interaction, approverId, beggarId, nickname) {
-	const eventFn = async i => {
-		const [approver, beggar] = await Promise.all([i.guild.members.fetch(approverId), i.guild.members.fetch(beggarId)])
-		let isApproved = i.customId.includes("approval") ? true : false;
-		let content = `<@${approverId}> has ${isApproved ? "approved" : "rejected"} the supplicant <@${beggarId}>'s request!`;
-		if (isApproved) {
-			content += `\n${beggar.displayName ? beggar.displayName : beggar.user.username } will be renamed to ${nickname}`;
-			beggar.setNickname(nickname);
-		}
-		i.reply({
-			content: content,
-			ephemeral: true
-		})
-	}
-	const eventOptions = systems.createEventOptions([`nickname-approval`, `nickname-rejection`], approverId, eventFn, utils.Time.DAY1, approverId)
-	systems.awaitCustomEventById(interaction.client, eventOptions);
-}
