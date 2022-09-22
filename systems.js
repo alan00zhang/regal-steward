@@ -2,6 +2,73 @@ require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const utils = require('./utils.js');
 
+class System {
+  constructor(client) {
+    this.client = client;
+    this.dbActiveEvents = this.createDB("activeEvents", "unique");
+  }
+
+  attachClient(client) {
+    this.client = client;
+    return this;
+  }
+
+  createDB(name, type) {
+    let db;
+    if (!type) db = new AbstractSystemDatabase(name);
+    else if (type === "unique") db = new UniqueSystemDatabase(name);
+    return db;
+  }
+}
+
+// Database class with basic CRUD operations
+class AbstractSystemDatabase {
+  constructor(name) {
+    this.name = name;
+    this.db = [];
+  }
+
+  get(value) {
+    return this.db.find(item => item === value);
+  }
+
+  getByKeyValue(key, value) {
+    return this.db.find(item => item.key === key && item.key.value === value);
+  }
+
+  store(item) {
+    this.db.push(item);
+  }
+
+  delete(item) {
+    let index = this.db.indexOf(item);
+    if (index !== -1) this.db.splice(index, 1);
+  }
+}
+
+// Inherited Database class that is tailored for objects of form {id: any, value: any}
+class UniqueSystemDatabase extends AbstractSystemDatabase {
+  getById(id) {
+    return this.db.find(item => item.id === id);
+  }
+
+  // Stores a new entry if item id does not exist in database
+  store(id, value, overwrite) {
+    const existingItem = this.getById(id);
+    if (!existingItem) {
+      this.db.push({id: id, value: value})
+    } else {
+      if (overwrite) existingItem.value = value
+    }
+  }
+
+  removeById(id) {
+    let index = this.db.findIndex(item => item.id === id);
+    if (index !== -1) this.db.splice(index, 1);
+  }
+}
+
+const system = new System();
 module.exports = {
   /**
    * Awaits for a custom event to fire, then removes itself as listener.
@@ -21,9 +88,19 @@ module.exports = {
    *  matchUserId?: string
    * 
    * }
+   * @param {Object} commandId Object for shutting down a unique command instance
+   * 
+   * CommandOptions is structured like so = {
+   * 
+   *  system: System,
+   * 
+   *  commandId: string
+   * 
+   * }
+   * 
    * @returns {Object} Returns an object with close() function to remove the listener manually
    */
-  awaitCustomEventById: (client, eventOptions) => {
+  awaitCustomEventById: (client, eventOptions, commandId) => {
     const interactionFn = async function(interaction) {
       if (Array.isArray(eventOptions.eventName)) {
         if (!eventOptions.eventName.some(name => `${name}-${eventOptions.customId}` === interaction.customId)) {
@@ -47,18 +124,22 @@ module.exports = {
         throw new Error(`Custom interaction event failed to fire.
         EventFn: ${eventOptions.eventFn}`);
       } finally {
+        if (commandId) {
+          system.dbActiveEvents.removeById(commandId);
+        }
         customEE.removeListener("interactionCreate", interactionFn);
       }
-
-      setInterval(() => {
-        customEE.removeListener("interactionCreate", interactionFn);
-      }, eventOptions.duration ? eventOptions.duration : 30000);
     }
-    
     const customEE = client.on("interactionCreate", interactionFn);
     const customEvent = {
       close: () => customEE.removeListener("interactionCreate", interactionFn)
     }
+    setTimeout(() => {
+      if (commandId) {
+        system.dbActiveEvents.removeById(commandId);
+      }
+      customEE.removeListener("interactionCreate", interactionFn);
+    }, eventOptions.duration ? eventOptions.duration : 30000);
     return customEvent;
   },
 
@@ -70,5 +151,9 @@ module.exports = {
       duration: duration,
       matchUserId: matchUserId?.toString()
     }
-  }
+  },
+  System,
+  system,
+  AbstractSystemDatabase,
+  UniqueSystemDatabase
 }
