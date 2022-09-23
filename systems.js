@@ -88,33 +88,42 @@ module.exports = {
    *  matchUserId?: string
    * 
    * }
-   * @param {Object} commandId Object for shutting down a unique command instance
+   * @param {Object} commandOptions Object for shutting down a unique command instance
    * 
    * CommandOptions is structured like so = {
    * 
-   *  system: System,
+   *  id: string,
    * 
-   *  commandId: string
+   *  removeAfterSuccess: boolean
    * 
    * }
    * 
    * @returns {Object} Returns an object with close() function to remove the listener manually
    */
-  awaitCustomEventById: (client, eventOptions, commandId) => {
+  awaitCustomEventById: (client, eventOptions, commandOptions) => {
     const interactionFn = async function(interaction) {
       if (Array.isArray(eventOptions.eventName)) {
         if (!eventOptions.eventName.some(name => `${name}-${eventOptions.customId}` === interaction.customId)) {
-          interaction.deferReply();
+          // if (!interaction.deferred && !interaction.replied) 
+          // try {
+          //   await interaction.deferReply();
+          // } catch (error) {
+          //   console.error(error);
+          // } finally {
+          //   return;
+          // }
           return;
         };
       }
       else if (interaction.customId !== `${eventOptions.eventName}-${eventOptions.customId}`) return; // must match a syntax such as approval-request-submit-288455203840196608
       if (eventOptions.matchUserId) {
         if (interaction.user.id !== eventOptions.matchUserId) {
-          await interaction.reply({
-            content: "You are not worthy.",
-            ephemeral: true
-          });
+          if (!interaction.deferred && !interaction.replied) {
+            await interaction.reply({
+              content: "You are not worthy.",
+              ephemeral: true
+            });
+          }
           return;
         };
       }
@@ -124,8 +133,8 @@ module.exports = {
         throw new Error(`Custom interaction event failed to fire.
         EventFn: ${eventOptions.eventFn}`);
       } finally {
-        if (commandId) {
-          system.dbActiveEvents.removeById(commandId);
+        if (commandOptions?.removeAfterSuccess) {
+          system.dbActiveEvents.removeById(commandOptions.id);
         }
         customEE.removeListener("interactionCreate", interactionFn);
       }
@@ -135,14 +144,24 @@ module.exports = {
       close: () => customEE.removeListener("interactionCreate", interactionFn)
     }
     setTimeout(() => {
-      if (commandId) {
-        system.dbActiveEvents.removeById(commandId);
+      if (commandOptions) {
+        system.dbActiveEvents.removeById(commandOptions.id);
       }
       customEE.removeListener("interactionCreate", interactionFn);
     }, eventOptions.duration ? eventOptions.duration : 30000);
     return customEvent;
   },
 
+    /**
+   * Creats the eventOptions config object for the awaitCustomEventById() function
+   * @param {string} eventName The name of the event
+   * @param {string} customId The member associated with the event's ID - this member's eventName
+   * @param {(interaction) => void} eventFn The function to execute once the custom event is detected/fired
+   * @param {number} duration The timeout value of the event listener in milliseconds
+   * @param {string} matchUserId The user ID of whoever should be the interactor
+   * 
+   * @returns {Object} Returns an object with close() function to remove the listener manually
+   */
   createEventOptions: (eventName, customId, eventFn, duration, matchUserId) => {
     return {
       eventName: eventName,

@@ -28,7 +28,9 @@ client.on('interactionCreate', async interaction => {
 	try {
 		await command.execute(interaction, system);
 	} catch (error) {
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		await interaction.channel.send(
+			{ content: `There was an error while executing !${interaction.commandName} from <@${interaction.user.id}>!
+			Bot is rebooting...` });
 		throw new Error(error.message)
 	}
 });
