@@ -156,7 +156,7 @@ module.exports = {
 						const updatedVictimRow = utils.createUpdatedSelectMenu(`nickname-victim-${interaction.user.id}`, victimOptions, selectedVictimId);
 						components = [updatedVictimRow, updatedApproverRow, submitRow];
 						await i.update({ 
-							content: `<@${interaction.user.id}> is begging to change <@${selectedVictimId}> name to ${interaction.options.getString("nickname")}!`,
+							content: `<@${interaction.user.id}> is begging to change <@${selectedVictimId}>'s name to ${interaction.options.getString("nickname")}!`,
 							components: components
 						});
 					} else {
