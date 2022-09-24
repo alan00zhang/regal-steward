@@ -30,7 +30,8 @@ client.on('interactionCreate', async interaction => {
 	} catch (error) {
 		await interaction.channel.send(
 			{ content: `There was an error while executing !${interaction.commandName} from <@${interaction.user.id}>!
-			Bot is rebooting...` });
+			Bot is rebooting...` 
+		});
 		throw new Error(error.message)
 	}
 });

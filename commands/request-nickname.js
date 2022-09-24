@@ -1,8 +1,8 @@
 const { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const utils = require('../utils.js');
 const systemsJs = require('../systems.js');
+const commandName = "request-nickname";
 
-var selectedApproverId, selectedVictimId;
 fetchApprovers = async function(interaction) {
 	// find eligible approver members
 	const options = [];
@@ -42,23 +42,23 @@ fetchVictims = async function(interaction) {
 
 createApprovalListener = function(interaction, beggar, collector, listenSuccess) {
 	const eventFn = async i => {
-		if (!utils.guardReply(i)) return;
+		if (!await utils.guardReply(i, commandName)) return;
 		listenSuccess.status = true;
 		collector.stop();
-		const approver = await i.guild.members.fetch(selectedApproverId);
+		const approver = await i.guild.members.fetch(beggar.selectedApproverId);
 
 		// construct ActionRow with Approve and Reject buttons
 		const row = new ActionRowBuilder()
 			.addComponents(
 				new ButtonBuilder()
-					.setCustomId(`nickname-approval-${selectedApproverId}`)
+					.setCustomId(`nickname-approval-${beggar.selectedApproverId}`)
 					.setLabel("Approve")
 					.setStyle(ButtonStyle.Primary)
 			)
 
 			.addComponents(
 				new ButtonBuilder()
-					.setCustomId(`nickname-rejection-${selectedApproverId}`)
+					.setCustomId(`nickname-rejection-${beggar.selectedApproverId}`)
 					.setLabel("Reject")
 					.setStyle(ButtonStyle.Danger)
 			)
@@ -69,7 +69,7 @@ createApprovalListener = function(interaction, beggar, collector, listenSuccess)
 		})
 
 		// wait for approval/rejection
-		processRequest(i, selectedApproverId, beggar.id, interaction.options.getString("nickname"))
+		await processRequest(i, beggar.selectedApproverId, beggar.selectedVictimId, beggar.id, interaction.options.getString("nickname"));
 	}
 	const eventOptions = systemsJs.createEventOptions("approval-request-submit", beggar.id, eventFn, utils.Time.MINUTE15, beggar.id);
 	const	commandOptions = {
@@ -78,9 +78,9 @@ createApprovalListener = function(interaction, beggar, collector, listenSuccess)
 	return systemsJs.awaitCustomEventById(interaction.client, eventOptions, commandOptions)
 }
 
-processRequest = function(interaction, approverId, beggarId, nickname) {
+processRequest = function(interaction, approverId, victimId, beggarId, nickname) {
 	const eventFn = async i => {
-		const [victim, beggar] = await Promise.all([i.guild.members.fetch(selectedVictimId), i.guild.members.fetch(beggarId)])
+		const [victim, beggar] = await Promise.all([i.guild.members.fetch(victimId), i.guild.members.fetch(beggarId)])
 		let isApproved = i.customId.includes("approval") ? true : false;
 		let content = `<@${approverId}> has ${isApproved ? "approved" : "rejected"} the supplicant <@${beggarId}>'s request!`;
 		if (isApproved) {
@@ -115,11 +115,11 @@ module.exports = {
 	async execute(interaction, system) {
 		const commandId = await utils.initSingletonCommand(interaction, system)
 		if (!commandId) return;
-		selectedApproverId = "";
-		selectedVictimId = "";
 		const displayName = interaction.member.displayName;
 		var approverOptions = await fetchApprovers(interaction);
 		var victimOptions = await fetchVictims(interaction);
+		var selectedApproverId = "";
+		var selectedVictimId = "";
 		const listenSuccess = {};
 
 		// construct ActionRow with dropdown menu listing members who are authorized to approve requests
@@ -140,11 +140,11 @@ module.exports = {
 
 		// create an InteractionCollector that watches and updates the dropdown menu whenever an option is selected,
 		// also updates the message with the Submit Request button
-		const collector = interaction.channel.createMessageComponentCollector({ componentType: ComponentType.SelectMenu, time: utils.Time.DAY1 });
+		const collector = interaction.channel.createMessageComponentCollector({ componentType: ComponentType.SelectMenu, time: utils.Time.MINUTE15 });
 		let listener;
 		collector.on('collect', async i => {
-			if (i.customId.startsWith(`nickname-approver`)) {
-				if (utils.guardReply(i)) {
+			if (i.customId === chooseApproverEventId) {
+				if (await utils.guardReply(i, commandName)) {
 					// display the clicked option as the selected value
 					selectedApproverId = i.values[0];
 					const updatedApproverRow = utils.createUpdatedSelectMenu(`nickname-approver-${interaction.user.id}`, approverOptions, selectedApproverId);
@@ -167,7 +167,9 @@ module.exports = {
 						// create beggar object to verify who sent the original request
 						let beggar = {
 							displayName: displayName,
-							id: interaction.user.id
+							id: interaction.user.id,
+							selectedApproverId: selectedApproverId,
+							selectedVictimId: selectedVictimId
 						}
 						// if listener for previous selected option is still open, close it
 						if (listener) {
@@ -177,8 +179,8 @@ module.exports = {
 						listener = createApprovalListener(interaction, beggar, collector, listenSuccess);
 					}
 				}
-			} else if (i.customId.startsWith(`nickname-victim`)) {
-				if (utils.guardReply(i)) {
+			} else if (i.customId === chooseVictimEventId) {
+				if (await utils.guardReply(i, commandName)) {
 					// display the clicked option as the selected value
 					selectedVictimId = i.values[0];
 					const updatedVictimRow = utils.createUpdatedSelectMenu(`nickname-victim-${interaction.user.id}`, victimOptions, selectedVictimId)
@@ -200,7 +202,9 @@ module.exports = {
 						// create beggar object to verify who sent the original request
 						let beggar = {
 							displayName: displayName,
-							id: interaction.user.id
+							id: interaction.user.id,
+							selectedApproverId: selectedApproverId,
+							selectedVictimId: selectedVictimId
 						}
 						if (listener) {
 							listener.close();

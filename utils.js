@@ -14,7 +14,7 @@ const getCommands = function(client) {
   }
 }
 
-const guardReply = async function(interaction, matchId) {
+const guardReply = async function(interaction, commandName, matchId) {
   // if matchId is not specified, the guard will reject interactions that are not related to the interacting user
   // ie. the customId does not match the interacting user id.
   let userId = matchId ? matchId : interaction.user.id;

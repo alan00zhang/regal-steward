@@ -3,13 +3,13 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const utils = require('./utils.js');
 
 class System {
-  constructor(client) {
-    this.client = client;
+  constructor() {
     this.dbActiveEvents = this.createDB("activeEvents", "unique");
   }
-
+  
   attachClient(client) {
     this.client = client;
+    this.client.system = this;
     return this;
   }
 
@@ -104,14 +104,6 @@ module.exports = {
     const interactionFn = async function(interaction) {
       if (Array.isArray(eventOptions.eventName)) {
         if (!eventOptions.eventName.some(name => `${name}-${eventOptions.customId}` === interaction.customId)) {
-          // if (!interaction.deferred && !interaction.replied) 
-          // try {
-          //   await interaction.deferReply();
-          // } catch (error) {
-          //   console.error(error);
-          // } finally {
-          //   return;
-          // }
           return;
         };
       }
