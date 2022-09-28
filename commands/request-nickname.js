@@ -64,7 +64,7 @@ createApprovalListener = function(interaction, beggar, collector, listenSuccess)
 			)
 
 		await i.reply({
-			content: `<@${approver.user.id}>, will you approve <@${beggar.id}>'s Request?`,
+			content: `<@${approver.user.id}>, will you approve <@${beggar.id}>'s request?`,
 			components: [row]
 		})
 

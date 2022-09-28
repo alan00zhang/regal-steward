@@ -22,9 +22,17 @@ const allResponses = [
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('magic-8-ball')
-		.setDescription('Ask the all-knowing and receive truth unbound'),
+		.setDescription('Ask the all-knowing and receive truth unbound')
+		.addStringOption(option => 
+			option.setName("question")
+				.setDescription("What do you seek?")
+				.setRequired(false)),
 	async execute(interaction) {
     let randomIndex = Math.floor(Math.random() * allResponses.length);
-		await interaction.reply(allResponses[randomIndex]);
+		let response = "";
+		let question = interaction.options.getString("question");
+		if (question) response = `<@${interaction.user.id}> asked: ${question}\n`;
+		response += allResponses[randomIndex]
+		await interaction.reply(response);
 	},
 };
