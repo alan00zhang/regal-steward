@@ -1,5 +1,6 @@
 require('dotenv').config({path: __dirname});
 const systemsJs = require('./systems.js');
+const sqlite3 = require('sqlite3').verbose();
 const { Client, GatewayIntentBits } = require('discord.js');
 const { getCommands } = require('./utils')
 const intents = [
@@ -16,8 +17,9 @@ const system = systemsJs.system.attachClient(client);
 getCommands(client);
 
 // When the client is ready, run this code (only once)
-client.once('ready', () => {
+client.once('ready', async () => {
 	console.log('Ready!');
+	await system.bank.open();
 });
 
 client.on('interactionCreate', async interaction => {
@@ -28,6 +30,15 @@ client.on('interactionCreate', async interaction => {
 	try {
 		await command.execute(interaction, system);
 	} catch (error) {
+		// Disconnect from the database
+		await system.bank.close((err) => {
+			if (err) {
+				console.error(err.message);
+			}
+			console.log('Closed the database connection.');
+		});
+		await system.bank.close();
+
 		await interaction.channel.send(
 			{ content: `There was an error while executing !${interaction.commandName} from <@${interaction.user.id}>!
 			Bot is rebooting...` 

@@ -1,10 +1,13 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const utils = require('./utils.js');
+const sqlite3 = require('sqlite3');
+const { open } = require('sqlite');
 
 class System {
   constructor() {
     this.dbActiveEvents = this.createDB("activeEvents", "unique");
+    this.bank = new Bank();
   }
   
   attachClient(client) {
@@ -67,6 +70,24 @@ class UniqueSystemDatabase extends AbstractSystemDatabase {
     if (index !== -1) this.db.splice(index, 1);
   }
 }
+
+class Bank {
+  constructor(system) {
+    this.system = system;
+  }
+
+  async open() {
+    this.db = await open({
+      filename: './regal-steward.db',
+      driver: sqlite3.Database
+    });
+  }
+
+  async close() {
+    await this.db.close();
+  }
+}
+
 
 const system = new System();
 module.exports = {
