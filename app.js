@@ -20,6 +20,7 @@ getCommands(client);
 client.once('ready', async () => {
 	console.log('Ready!');
 	await system.bank.open();
+	system.bank.loadNewUsers();
 });
 
 client.on('interactionCreate', async interaction => {
@@ -31,16 +32,10 @@ client.on('interactionCreate', async interaction => {
 		await command.execute(interaction, system);
 	} catch (error) {
 		// Disconnect from the database
-		await system.bank.close((err) => {
-			if (err) {
-				console.error(err.message);
-			}
-			console.log('Closed the database connection.');
-		});
 		await system.bank.close();
 
 		await interaction.channel.send(
-			{ content: `There was an error while executing !${interaction.commandName} from <@${interaction.user.id}>!
+			{ content: `There was an error while executing /${interaction.commandName} from <@${interaction.user.id}>!
 			Bot is rebooting...` 
 		});
 		throw new Error(error.message)

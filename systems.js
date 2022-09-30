@@ -7,7 +7,7 @@ const { open } = require('sqlite');
 class System {
   constructor() {
     this.dbActiveEvents = this.createDB("activeEvents", "unique");
-    this.bank = new Bank();
+    this.bank = new Bank(this);
   }
   
   attachClient(client) {
@@ -71,6 +71,7 @@ class UniqueSystemDatabase extends AbstractSystemDatabase {
   }
 }
 
+// The Bank class represents the SQLite database responsible for storing persistent user data
 class Bank {
   constructor(system) {
     this.system = system;
@@ -85,6 +86,51 @@ class Bank {
 
   async close() {
     await this.db.close();
+  }
+
+  async getUser(id) {
+    return await this.db.get("SELECT * FROM users WHERE id = ?", id)
+  }
+
+  async getAllUsers() {
+    return await this.db.all("SELECT id FROM users");
+  }
+
+  async loadNewUsers() {
+    let existingUsers = await this.getAllUsers();
+    let newUsers = [];
+    const guilds = await this.system.client.guilds.fetch();
+    for (let [guildSnowflake, oauthGuild] of guilds) {
+      let guild = await oauthGuild.fetch();
+      let members = await guild.members.fetch();
+      for (let [memberSnowflake, member] of members) {
+        if (
+          !existingUsers.find(user => user.id == member.id) 
+          && !newUsers.find(user => user.id == member.id)
+          && !member.user.bot
+        ) {
+          newUsers.push({ id: member.id, username: member.user.username })
+        }
+      }
+    }
+    let stmt = "INSERT INTO users(id, username) VALUES ";
+    for (let i = 0; i < newUsers.length; i++) {
+      if (i === 0) {
+        stmt += `('${newUsers[i].id}', '${newUsers[i].username}')`
+      } else {
+        stmt += `, ('${newUsers[i].id}', '${newUsers[i].username}')`;
+      }
+    }
+    if (newUsers.length) await this.db.run(stmt);
+    return;
+  }
+
+  async getBalance(id) {
+    let user = await this.getUser(id);
+    return {
+      bankAmount: user.bank_amount / 100, 
+      slumAmount: user.slum_amount
+    };
   }
 }
 

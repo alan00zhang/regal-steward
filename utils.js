@@ -35,7 +35,7 @@ const initSingletonCommand = async function(interaction, system) {
   if (system.dbActiveEvents.getById(commandId)) {
     try {
       await interaction.reply({
-        content: `You can only have one !${interaction.commandName} command open at once.`,
+        content: `You can only have one /${interaction.commandName} command open at once.`,
         ephemeral: true
       });
     } catch (error) {
