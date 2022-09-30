@@ -20,7 +20,7 @@ getCommands(client);
 client.once('ready', async () => {
 	console.log('Ready!');
 	await system.bank.open();
-	system.bank.loadNewUsers();
+	await system.bank.loadNewUsers();
 });
 
 client.on('interactionCreate', async interaction => {
@@ -29,7 +29,8 @@ client.on('interactionCreate', async interaction => {
 	if (!command) return;
 	
 	try {
-		await command.execute(interaction, system);
+		let userAccount = await system.bank.getUserAccount(interaction.member.id)
+		await command.execute(interaction, userAccount);
 	} catch (error) {
 		// Disconnect from the database
 		await system.bank.close();

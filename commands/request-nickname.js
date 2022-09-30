@@ -112,8 +112,8 @@ module.exports = {
 				.setDescription("What should the new nickname be?")
 				.setRequired(true)),
 
-	async execute(interaction, system) {
-		const commandId = await utils.initSingletonCommand(interaction, system)
+	async execute(interaction) {
+		const commandId = await utils.initSingletonCommand(interaction, interaction.client.system)
 		if (!commandId) return;
 		const displayName = interaction.member.displayName;
 		var approverOptions = await fetchApprovers(interaction);
@@ -217,7 +217,7 @@ module.exports = {
 		});
 
 		collector.once('end', collected => {
-			if (!listenSuccess.status) system.dbActiveEvents.removeById(commandId);
+			if (!listenSuccess.status) interaction.client.system.dbActiveEvents.removeById(commandId);
 		});
 
 		await interaction.reply({ components: [victimRow, approverRow] });

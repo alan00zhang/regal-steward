@@ -88,16 +88,16 @@ class Bank {
     await this.db.close();
   }
 
-  async getUser(id) {
-    return await this.db.get("SELECT * FROM users WHERE id = ?", id)
+  async getUserAccount(id) {
+    return new BankAccount(await this.db.get("SELECT * FROM users WHERE id = ?", id), this);
   }
 
-  async getAllUsers() {
+  async getAllUserIds() {
     return await this.db.all("SELECT id FROM users");
   }
 
   async loadNewUsers() {
-    let existingUsers = await this.getAllUsers();
+    let existingUsers = await this.getAllUserIds();
     let newUsers = [];
     const guilds = await this.system.client.guilds.fetch();
     for (let [guildSnowflake, oauthGuild] of guilds) {
@@ -126,14 +126,66 @@ class Bank {
   }
 
   async getBalance(id) {
-    let user = await this.getUser(id);
+    let account = await this.getUserAccount(id);
     return {
-      bankAmount: user.bank_amount / 100, 
-      slumAmount: user.slum_amount
+      bankAmount: account.bankBalance, 
+      slumAmount: account.slumBalance
     };
+  }
+
+  async setBankBalance(id, newBalance) {
+    return await this.db.run(`UPDATE users SET bank_amount = ? WHERE id = ?`, newBalance, id);
+  }
+
+  async setSlumBalance(id, newBalance) {
+    return await this.db.run(`UPDATE users SET slum_amount = ? WHERE id = ?`, newBalance, id);
   }
 }
 
+// The BankAccount class represents a single user's entry in the bank database
+class BankAccount {
+  constructor(data, bank) {
+    this.bank = bank;
+    this.id = data.id
+    this.userData = data;
+  }
+
+  get bankBalance() {
+    return this.userData.bank_amount / 100;
+  }
+
+  set bankBalance(val) {
+    this.bank.setBankBalance(this.id, val);
+  }
+  
+  get slumBalance() {
+    return this.userData.slum_amount;
+  }
+
+  set slumBalance(val) {
+    this.bank.setSlumBalance(this.id, val);
+  }
+
+  async addBank(val) {
+    let currentBalance = this.userData.bank_amount;
+    await this.bank.setBankBalance(this.id, Number(currentBalance + val))
+  }
+
+  async subtractBank(val) {
+    let currentBalance = this.userData.bank_amount;
+    await this.bank.setBankBalance(this.id, Number(currentBalance - val))
+  }
+
+  async addSlum(val) {
+    let currentBalance = this.userData.slum_amount;
+    await this.bank.setSlumBalance(this.id, Number(currentBalance + val))
+  }
+
+  async subtractSlum(val) {
+    let currentBalance = this.userData.slum_amount;
+    await this.bank.setSlumBalance(this.id, Number(currentBalance - val))
+  }
+}
 
 const system = new System();
 module.exports = {
