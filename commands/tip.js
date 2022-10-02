@@ -23,6 +23,13 @@ module.exports = {
       });
       return;
     }
+    if (userAccount.userData.bank_amount / 100 < tip) {
+      await interaction.reply({
+        content: "You can't afford that.",
+        ephemeral: true
+      });
+      return;
+    }
     let recipientAccount = await interaction.client.system.bank.getUserAccount(
       tipee.id
     )
