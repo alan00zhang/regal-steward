@@ -6,8 +6,7 @@ module.exports = {
 		.setName('check-balance')
 		.setDescription('Check your bank account balance.'),
 	async execute(interaction, userAccount) {
-    const monies = await interaction.client.system.bank.getBalance(interaction.member.id)
-    let response = `You have ${monies.bankAmount.toLocaleString(undefined, {minimumFractionDigits: 2})} ${utils.Units.bank} and ${monies.slumAmount.toLocaleString()} ${utils.Units.slum}.`
+    let response = `You have ${userAccount.bankBalance} ${utils.Units.bank} and ${userAccount.slumBalance.toLocaleString()} ${utils.Units.slum}.`
 		await interaction.reply({
       content: response,
       ephemeral: true
