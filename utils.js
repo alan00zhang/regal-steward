@@ -78,6 +78,11 @@ const Time = {
   WEEK1: 1000 * 60 * 60 * 24 * 7,
 }
 
+const Units = {
+  bank: "Emporeum",
+  slum: "SlumCoin"
+}
+
 module.exports = {
-  getCommands, guardReply, initSingletonCommand, createSelectMenu, createUpdatedSelectMenu, Time
+  getCommands, guardReply, initSingletonCommand, createSelectMenu, createUpdatedSelectMenu, Time, Units
 }
