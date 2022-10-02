@@ -23,7 +23,7 @@ module.exports = {
       });
       return;
     }
-    if (userAccount.userData.bank_amount / 100 < tip) {
+    if (userAccount.userData.bank_amount / 100 < tip || tip < 0) {
       await interaction.reply({
         content: "You can't afford that.",
         ephemeral: true
@@ -38,7 +38,7 @@ module.exports = {
       recipientAccount.addBank(tip * 100)
     ])
 		await interaction.reply({
-      content: `<@${interaction.member.id}> tipped <@${tipee.id}> ${tip.toLocaleString(undefined, {minimumFractionDigits: 2})} ${utils.Units.bank}`
+      content: `<@${interaction.member.id}> tipped <@${tipee.id}> ${Number(tip).toLocaleString(undefined, {minimumFractionDigits: 2})} ${utils.Units.bank}`
     });
 		await interaction.followUp({
       content: `You have ${userAccount.bankBalance} ${utils.Units.bank} left in your account.`,

@@ -172,7 +172,7 @@ class BankAccount {
   }
   
   get slumBalance() {
-    return this.userData.slum_amount;
+    return this.userData.slum_amount.toLocaleString();
   }
 
   set slumBalance(val) {

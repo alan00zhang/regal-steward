@@ -6,7 +6,7 @@ module.exports = {
 		.setName('check-balance')
 		.setDescription('Check your bank account balance.'),
 	async execute(interaction, userAccount) {
-    let response = `You have ${userAccount.bankBalance} ${utils.Units.bank} and ${userAccount.slumBalance.toLocaleString()} ${utils.Units.slum}.`
+    let response = `You have ${userAccount.bankBalance} ${utils.Units.bank} and ${userAccount.slumBalance} ${utils.Units.slum}.`
 		await interaction.reply({
       content: response,
       ephemeral: true
