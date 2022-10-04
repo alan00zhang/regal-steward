@@ -24,47 +24,39 @@ runGame = (interaction, collector, listenSuccess, bet) => {
 		collector.stop();
 
     let [r1, r2, r3] = [roll(), roll(), roll()];
-    let response = `You rolled... \n:${r1}: :${r2}: :${r3}:`;
-      await i.reply({
-        content: `Rolling...`,
-        ephemeral: true
-      });
-      
-      setTimeout(async () => {
-        await i.followUp({
-          content: response,
-          ephemeral: true
-        });
-        
-        let wins = [r1, r2, r3].filter(x => x === bet.selectedSuit).length;
+    let response = `<@${i.member.id}> picked ${bet.selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
 
-        if (wins) {
-          let winAmount = (wins + 1) * bet.amount;
-          await Promise.all([
-            bet.userAccount.addBank(winAmount * 100),
-            bet.userAccount.addCasinoWinnings(winAmount * 100)
-          ]);
-        } else {
-          await Promise.all([
-            bet.userAccount.subtractBank(bet.amount * 100),
-            bet.userAccount.addCasinoLosses(bet.amount * 100)
-          ]);
-        }
+    await i.reply({
+      content: response,
+    });
+    
+    let wins = [r1, r2, r3].filter(x => x === bet.selectedSuit).length;
 
-        let finalResponse = `Your suit came up ${wins} times.\n`
-        finalResponse += wins ? `You won ${(wins + 1) * bet.amount} ${utils.Units.bank}!` : `You lose! You lose!`;
-        finalResponse += `\nYou have ${bet.userAccount.bankBalance} ${utils.Units.bank} left in your account.`
-        i.followUp({
-          content: finalResponse,
-          ephemeral: true
-        });
+    if (wins) {
+      let winAmount = (wins + 1) * bet.amount;
+      await Promise.all([
+        bet.userAccount.addBank(winAmount * 100),
+        bet.userAccount.addCasinoWinnings(winAmount * 100)
+      ]);
+    } else {
+      await Promise.all([
+        bet.userAccount.subtractBank(bet.amount * 100),
+        bet.userAccount.addCasinoLosses(bet.amount * 100)
+      ]);
+    }
 
-        let name = i.member.displayName ? i.member.displayName : i.user.username;
-        let announcement = wins 
-        ? `${name} has won ${(wins + 1) * bet.amount} ${utils.Units.bank} playing Crown and Anchor!` 
-        : `${name} has lost ${bet.amount} ${utils.Units.bank} playing Crown and Anchor!`;
-        i.channel.send(announcement)
-      }, 1000);
+    let finalResponse = `Your suit came up ${wins} times.\n`
+    finalResponse += wins ? `You won ${(wins + 1) * bet.amount} ${utils.Units.bank}!` : `You lose! You lose!`;
+    finalResponse += `\nYou have ${bet.userAccount.bankBalance} ${utils.Units.bank} left in your account.`
+    await i.followUp({
+      content: finalResponse,
+      ephemeral: true
+    });
+
+    let announcement = wins 
+    ? `<@${i.member.id}> has won ${(wins + 1) * bet.amount} ${utils.Units.bank} playing Crown and Anchor!` 
+    : `<@${i.member.id}> has lost ${bet.amount} ${utils.Units.bank} playing Crown and Anchor!`;
+    i.channel.send(announcement)
   }
   const eventOptions = systemsJs.createEventOptions("caa-start", betterId, eventFn, utils.Time.MINUTE5, betterId);
   const	commandOptions = {
