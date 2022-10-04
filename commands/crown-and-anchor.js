@@ -25,9 +25,6 @@ runGame = (interaction, collector, listenSuccess, bet) => {
 
     let [r1, r2, r3] = [roll(), roll(), roll()];
     let response = `You rolled... \n:${r1}: :${r2}: :${r3}:`;
-    // if (wins) {
-      //   response += `\n You won! ${wins} times`
-      // }
       await i.reply({
         content: `Rolling...`,
         ephemeral: true
@@ -86,10 +83,6 @@ module.exports = {
         .setDescription(`How much ${utils.Units.bank} will you wager?`)
         .setRequired(true)),
 	async execute(interaction, userAccount) {
-    const commandId = await utils.initSingletonCommand(interaction, interaction.client.system)
-		if (!commandId) return;
-
-    let listenSuccess = {};
     const bet = interaction.options.getNumber("bet").toFixed(2);
     if (userAccount.userData.bank_amount / 100 < bet || bet < 0) {
       await interaction.reply({
@@ -98,6 +91,10 @@ module.exports = {
       });
       return;
     }
+    const commandId = await utils.initSingletonCommand(interaction, interaction.client.system)
+		if (!commandId) return;
+
+    let listenSuccess = {};
     let suitSelectId = `caa-suit-select-${interaction.member.id}`
     const betOptionRow = utils.createSelectMenu(
       suitSelectId, 
