@@ -24,7 +24,7 @@ runGame = (interaction, collector, listenSuccess, bet) => {
 		collector.stop();
 
     let [r1, r2, r3] = [roll(), roll(), roll()];
-    let response = `<@${i.member.id}> is playing a game of Crown and Anchor\nThey picked ${bet.selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
+    let response = `<@${i.member.id}> is playing a game of Crown and Anchor\n\nThey picked ${bet.selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
 
     await i.reply({
       content: response,

@@ -102,7 +102,7 @@ class Bank {
   }
 
   async getCasinoLeaderboards() {
-    return await this.db.all(`SELECT CAST(id as text), casino_winnings FROM users ORDER BY casino_winnings DESC, bank_amount DESC`);
+    return await this.db.all(`SELECT CAST(id as text), casino_winnings, casino_losses FROM users ORDER BY casino_winnings DESC, bank_amount DESC`);
   }
 
   async loadNewUsers() {
