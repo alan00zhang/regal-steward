@@ -146,6 +146,22 @@ class Bank {
     }
   }
 
+  async setCasinoWinnings(id, newBalance) {
+    try {
+      return await this.db.run(`UPDATE users SET casino_winnings = ? WHERE id = ?`, newBalance, id);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async setCasinoLosses(id, newBalance) {
+    try {
+      return await this.db.run(`UPDATE users SET casino_losses = ? WHERE id = ?`, newBalance, id);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   async setSlumBalance(id, newBalance) {
     try {
       return await this.db.run(`UPDATE users SET slum_amount = ? WHERE id = ?`, newBalance, id);
@@ -178,6 +194,22 @@ class BankAccount {
   set slumBalance(val) {
     this.userData.slum_amount = val;
   }
+  
+  get casinoWinnings() {
+    return (this.userData.casino_winnings / 100).toLocaleString(undefined, {minimumFractionDigits: 2});
+  }
+
+  set casinoWinnings(val) {
+    this.userData.casino_winnings = val;
+  }
+  
+  get casinoLosses() {
+    return (this.userData.casino_losses / 100).toLocaleString(undefined, {minimumFractionDigits: 2});
+  }
+
+  set casinoLosses(val) {
+    this.userData.casino_losses = val;
+  }
 
   async addBank(val) {
     let newBalance = this.userData.bank_amount + val;
@@ -190,6 +222,20 @@ class BankAccount {
     let newBalance = this.userData.bank_amount - val;
     await this.bank.setBankBalance(this.id, newBalance);
     this.bankBalance = newBalance;
+    return;
+  }
+
+  async addCasinoWinnings(val) {
+    let newBalance = this.userData.casino_winnings + val;
+    await this.bank.setCasinoWinnings(this.id, newBalance);
+    this.casinoWinnings = newBalance;
+    return;
+  }
+
+  async addCasinoLosses(val) {
+    let newBalance = this.userData.casino_losses + val;
+    await this.bank.setCasinoLosses(this.id, newBalance);
+    this.casinoLosses = newBalance;
     return;
   }
 
@@ -287,7 +333,7 @@ module.exports = {
     /**
    * Creats the eventOptions config object for the awaitCustomEventById() function
    * @param {string} eventName The name of the event
-   * @param {string} customId The member associated with the event's ID - this member's eventName
+   * @param {string} customId The member associated with the event's ID
    * @param {(interaction) => void} eventFn The function to execute once the custom event is detected/fired
    * @param {number} duration The timeout value of the event listener in milliseconds
    * @param {string} matchUserId The user ID of whoever should be the interactor

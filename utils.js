@@ -67,6 +67,7 @@ const createUpdatedSelectMenu = function(customId, options, selectedValue) {
 }
 
 const Time = {
+  MINUTE5: 1000 * 60 * 5,
   MINUTE15: 1000 * 60 * 15,
   MINUTE30: 1000 * 60 * 30,
   HOUR1: 1000 * 60 * 60,

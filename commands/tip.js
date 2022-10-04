@@ -15,8 +15,8 @@ module.exports = {
         .setRequired(true)),
 	async execute(interaction, userAccount) {
     const tip = interaction.options.getNumber("amount").toFixed(2);
-    const tipee = interaction.options.getUser("recipient");
-    if (tipee.bot) {
+    const tippee = interaction.options.getUser("recipient");
+    if (tippee.bot) {
       await interaction.reply({
         content: "Do NOT tip a bot. NO.",
         ephemeral: true
@@ -31,14 +31,14 @@ module.exports = {
       return;
     }
     let recipientAccount = await interaction.client.system.bank.getUserAccount(
-      tipee.id
+      tippee.id
     )
     await Promise.all([
       userAccount.subtractBank(tip * 100),
       recipientAccount.addBank(tip * 100)
     ])
 		await interaction.reply({
-      content: `<@${interaction.member.id}> tipped <@${tipee.id}> ${Number(tip).toLocaleString(undefined, {minimumFractionDigits: 2})} ${utils.Units.bank}`
+      content: `<@${interaction.member.id}> tipped <@${tippee.id}> ${Number(tip).toLocaleString(undefined, {minimumFractionDigits: 2})} ${utils.Units.bank}`
     });
 		await interaction.followUp({
       content: `You have ${userAccount.bankBalance} ${utils.Units.bank} left in your account.`,

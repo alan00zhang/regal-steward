@@ -95,7 +95,7 @@ processRequest = function(interaction, approverId, victimId, beggarId, nickname)
 			content: content
 		})
 	}
-	const eventOptions = systemsJs.createEventOptions([`nickname-approval`, `nickname-rejection`], approverId, eventFn, utils.Time.DAY1, approverId)
+	const eventOptions = systemsJs.createEventOptions([`nickname-approval`, `nickname-rejection`], approverId, eventFn, utils.Time.MINUTE15, approverId)
 	const	commandOptions = {
 		id: `request-nickname-${beggarId}`,
 		removeAfterSuccess: true
