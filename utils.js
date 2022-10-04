@@ -81,6 +81,7 @@ const Time = {
 
 const Units = {
   bank: "Emporeum",
+  bankPrefix: "**𝔼**",
   slum: "SlumCoin"
 }
 

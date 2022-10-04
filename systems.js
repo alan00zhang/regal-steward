@@ -101,6 +101,10 @@ class Bank {
     return await this.db.all("SELECT id FROM users");
   }
 
+  async getCasinoLeaderboards() {
+    return await this.db.all(`SELECT CAST(id as text), casino_winnings FROM users ORDER BY casino_winnings DESC, bank_amount DESC`);
+  }
+
   async loadNewUsers() {
     let existingUsers = await this.getAllUserIds();
     let newUsers = [];
@@ -120,7 +124,16 @@ class Bank {
     }
     let stmt = "INSERT INTO users(id, username) VALUES ";
     for (let i = 0; i < newUsers.length; i++) {
-      if (i === 0) {
+
+      // check for SQL injection
+      let injectionAttempt = false;
+      if (newUsers[i].include("DROP TABLE")) {
+        injectionAttempt = true;
+        continue;
+      }
+
+      if (i === 0 || injectionAttempt) {
+        injectionAttempt = false;
         stmt += `('${newUsers[i].id}', '${newUsers[i].username}')`
       } else {
         stmt += `, ('${newUsers[i].id}', '${newUsers[i].username}')`;

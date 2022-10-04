@@ -24,7 +24,7 @@ runGame = (interaction, collector, listenSuccess, bet) => {
 		collector.stop();
 
     let [r1, r2, r3] = [roll(), roll(), roll()];
-    let response = `<@${i.member.id}> picked ${bet.selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
+    let response = `<@${i.member.id}> is playing a game of Crown and Anchor\nThey picked ${bet.selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
 
     await i.reply({
       content: response,
@@ -47,15 +47,15 @@ runGame = (interaction, collector, listenSuccess, bet) => {
 
     let finalResponse = `Your suit came up ${wins} times.\n`
     finalResponse += wins ? `You won ${(wins + 1) * bet.amount} ${utils.Units.bank}!` : `You lose! You lose!`;
-    finalResponse += `\nYou have ${bet.userAccount.bankBalance} ${utils.Units.bank} left in your account.`
+    finalResponse += `\nYou have ${utils.Units.bankPrefix} ${bet.userAccount.bankBalance} left in your account.`
     await i.followUp({
       content: finalResponse,
       ephemeral: true
     });
 
     let announcement = wins 
-    ? `<@${i.member.id}> has won ${(wins + 1) * bet.amount} ${utils.Units.bank} playing Crown and Anchor!` 
-    : `<@${i.member.id}> has lost ${bet.amount} ${utils.Units.bank} playing Crown and Anchor!`;
+    ? `<@${i.member.id}> has won ${utils.Units.bankPrefix} ${(wins + 1) * bet.amount} playing Crown and Anchor!` 
+    : `<@${i.member.id}> has lost ${utils.Units.bankPrefix} ${bet.amount} playing Crown and Anchor!`;
     i.channel.send(announcement)
   }
   const eventOptions = systemsJs.createEventOptions("caa-start", betterId, eventFn, utils.Time.MINUTE5, betterId);
