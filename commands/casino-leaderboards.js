@@ -13,8 +13,8 @@ module.exports = {
     for (let i = 0; i < top5.length; i++) {
       response += `
       ${i+1}. <@${top5[i]["CAST(id as text)"]}>
-      Total Winnings: ${utils.Units.bankPrefix}${(top5[i].casino_winnings / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}
-      Total Losses: ${utils.Units.bankPrefix}${(top5[i].casino_losses / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}\n`;
+      Total Winnings: ${utils.Units.bankPrefix} ${(top5[i].casino_winnings / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}
+      Total Losses: ${utils.Units.bankPrefix} ${(top5[i].casino_losses / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}\n`;
     }
 		await interaction.reply({
       content: response,

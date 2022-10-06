@@ -39,9 +39,11 @@ runGame = (interaction, collector, listenSuccess, bet) => {
         bet.userAccount.addCasinoWinnings(winAmount * 100)
       ]);
     } else {
+      let banker = await interaction.client.system.bank.getUserAccount("bank");
       await Promise.all([
         bet.userAccount.subtractBank(bet.amount * 100),
-        bet.userAccount.addCasinoLosses(bet.amount * 100)
+        bet.userAccount.addCasinoLosses(bet.amount * 100),
+        banker.addBank(bet.amount * 100)
       ]);
     }
 

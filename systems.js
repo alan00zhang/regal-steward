@@ -3,6 +3,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const utils = require('./utils.js');
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
+const { SalaryService } = require('./services/salary-service.js');
 
 class System {
   constructor() {
@@ -13,6 +14,7 @@ class System {
   attachClient(client) {
     this.client = client;
     this.client.system = this;
+    this.Salary = new SalaryService(client);
     return this;
   }
 
@@ -98,7 +100,8 @@ class Bank {
   }
 
   async getAllUserIds() {
-    return await this.db.all("SELECT id FROM users");
+    let temp = await this.db.all("SELECT CAST(id as text) FROM users");
+    return temp.map(user => user["CAST(id as text)"]);
   }
 
   async getCasinoLeaderboards() {
@@ -114,7 +117,7 @@ class Bank {
       let members = await guild.members.fetch();
       for (let [memberSnowflake, member] of members) {
         if (
-          !existingUsers.find(user => user.id == member.id) 
+          existingUsers.indexOf(member.id) === -1
           && !newUsers.find(user => user.id == member.id)
           && !member.user.bot
         ) {
@@ -127,7 +130,7 @@ class Bank {
 
       // check for SQL injection
       let injectionAttempt = false;
-      if (newUsers[i].include("DROP TABLE")) {
+      if (newUsers[i].username.include("DROP TABLE")) {
         injectionAttempt = true;
         continue;
       }
@@ -188,7 +191,7 @@ class Bank {
 class BankAccount {
   constructor(id, data, bank) {
     this.bank = bank;
-    this.id = id
+    this.id = id;
     this.userData = data;
   }
 
@@ -222,6 +225,10 @@ class BankAccount {
 
   set casinoLosses(val) {
     this.userData.casino_losses = val;
+  }
+
+  get salary() {
+    return (this.userData.salary / 100).toLocaleString(undefined, {minimumFractionDigits: 2});
   }
 
   async addBank(val) {

@@ -38,7 +38,7 @@ module.exports = {
       recipientAccount.addBank(tip * 100)
     ])
 		await interaction.reply({
-      content: `<@${interaction.member.id}> tipped <@${tippee.id}> ${Number(tip).toLocaleString(undefined, {minimumFractionDigits: 2})} ${utils.Units.bank}`
+      content: `<@${interaction.member.id}> tipped <@${tippee.id}> ${utils.Units.bankPrefix} ${Number(tip).toLocaleString(undefined, {minimumFractionDigits: 2})}`
     });
 		await interaction.followUp({
       content: `You have ${userAccount.bankBalance} ${utils.Units.bank} left in your account.`,
