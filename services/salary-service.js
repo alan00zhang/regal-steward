@@ -16,7 +16,7 @@ class SalaryService {
 
   async paySalaries() {
     let responseTable = await this.bank.db.get("SELECT date_paid == date() FROM salary_log ORDER BY paycheque_id DESC LIMIT 1");
-    if (responseTable["date_paid == date()"]) {
+    if (responseTable?.["date_paid == date()"]) {
       return;
     };
     let existingUsers = await this.bank.getAllUserIds();
