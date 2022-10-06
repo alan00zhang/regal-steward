@@ -33,13 +33,13 @@ module.exports = {
     let recipientAccount = await interaction.client.system.bank.getUserAccount(
       tippee.id
     )
-    await Promise.all([
-      userAccount.subtractBank(tip * 100),
-      recipientAccount.addBank(tip * 100)
-    ])
+    await userAccount.subtractBank(tip * 100);
+    await recipientAccount.addBank(tip * 100);
+
 		await interaction.reply({
       content: `<@${interaction.member.id}> tipped <@${tippee.id}> ${utils.Units.bankPrefix} ${Number(tip).toLocaleString(undefined, {minimumFractionDigits: 2})}`
     });
+    
 		await interaction.followUp({
       content: `You have ${userAccount.bankBalance} ${utils.Units.bank} left in your account.`,
       ephemeral: true

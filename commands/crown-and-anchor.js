@@ -31,6 +31,7 @@ runGame = (interaction, collector, listenSuccess, bet) => {
     });
     
     let wins = [r1, r2, r3].filter(x => x === bet.selectedSuit).length;
+    let banker = await interaction.client.system.bank.getUserAccount("bank");
 
     if (wins) {
       let winAmount = (wins + 1) * bet.amount;
@@ -39,7 +40,6 @@ runGame = (interaction, collector, listenSuccess, bet) => {
         bet.userAccount.addCasinoWinnings(winAmount * 100)
       ]);
     } else {
-      let banker = await interaction.client.system.bank.getUserAccount("bank");
       await Promise.all([
         bet.userAccount.subtractBank(bet.amount * 100),
         bet.userAccount.addCasinoLosses(bet.amount * 100),
@@ -58,6 +58,7 @@ runGame = (interaction, collector, listenSuccess, bet) => {
     let announcement = wins 
     ? `<@${i.member.id}> has won ${utils.Units.bankPrefix} ${(wins + 1) * bet.amount} playing Crown and Anchor!` 
     : `<@${i.member.id}> has lost ${utils.Units.bankPrefix} ${bet.amount} playing Crown and Anchor!`;
+    announcement += `\n\nThere is ${utils.Units.bankPrefix} ${banker.bankBalance} in the jackpot.`
     i.channel.send(announcement)
   }
   const eventOptions = systemsJs.createEventOptions("caa-start", betterId, eventFn, utils.Time.MINUTE5, betterId);
@@ -93,12 +94,11 @@ module.exports = {
     const betOptionRow = utils.createSelectMenu(
       suitSelectId, 
       outcomes,
-      // outcomes.map(outcome => outcome[0] = outcome[0].toUpperCase()),
       "Pick a suit"
     );
 
     // create an InteractionCollector that watches and updates the dropdown menu whenever an option is selected,
-		// also updates the message with the Submit Request button
+		// also updates the message with the Start Game button
 		const collector = interaction.channel.createMessageComponentCollector({ componentType: ComponentType.SelectMenu, time: utils.Time.MINUTE5 });
 		let listener;
 		collector.on('collect', async i => {

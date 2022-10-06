@@ -154,33 +154,33 @@ class Bank {
     };
   }
 
-  async setBankBalance(id, newBalance) {
+  async addBankBalance(id, balance) {
     try {
-      return await this.db.run(`UPDATE users SET bank_amount = ? WHERE id = ?`, newBalance, id);
+      return await this.db.run(`UPDATE users SET bank_amount = bank_amount + ? WHERE id = ?`, balance, id);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async setCasinoWinnings(id, newBalance) {
+  async addCasinoWinnings(id, balance) {
     try {
-      return await this.db.run(`UPDATE users SET casino_winnings = ? WHERE id = ?`, newBalance, id);
+      return await this.db.run(`UPDATE users SET casino_winnings = casino_winnings + ? WHERE id = ?`, balance, id);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async setCasinoLosses(id, newBalance) {
+  async addCasinoLosses(id, balance) {
     try {
-      return await this.db.run(`UPDATE users SET casino_losses = ? WHERE id = ?`, newBalance, id);
+      return await this.db.run(`UPDATE users SET casino_losses = casino_losses + ? WHERE id = ?`, balance, id);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async setSlumBalance(id, newBalance) {
+  async addSlumBalance(id, balance) {
     try {
-      return await this.db.run(`UPDATE users SET slum_amount = ? WHERE id = ?`, newBalance, id);
+      return await this.db.run(`UPDATE users SET slum_amount = slum_amount + ? WHERE id = ?`, balance, id);
     } catch (error) {
       console.error(error)
     }
@@ -233,42 +233,42 @@ class BankAccount {
 
   async addBank(val) {
     let newBalance = this.userData.bank_amount + val;
-    await this.bank.setBankBalance(this.id, newBalance);
+    await this.bank.addBankBalance(this.id, val);
     this.bankBalance = newBalance;
     return;
   }
 
   async subtractBank(val) {
     let newBalance = this.userData.bank_amount - val;
-    await this.bank.setBankBalance(this.id, newBalance);
+    await this.bank.addBankBalance(this.id, val * -1);
     this.bankBalance = newBalance;
     return;
   }
 
   async addCasinoWinnings(val) {
     let newBalance = this.userData.casino_winnings + val;
-    await this.bank.setCasinoWinnings(this.id, newBalance);
+    await this.bank.addCasinoWinnings(this.id, val);
     this.casinoWinnings = newBalance;
     return;
   }
 
   async addCasinoLosses(val) {
     let newBalance = this.userData.casino_losses + val;
-    await this.bank.setCasinoLosses(this.id, newBalance);
+    await this.bank.addCasinoLosses(this.id, val);
     this.casinoLosses = newBalance;
     return;
   }
 
   async addSlum(val) {
     let newBalance = this.userData.slum_amount + val;
-    await this.bank.setSlumBalance(this.id, newBalance);
+    await this.bank.addSlumBalance(this.id, val);
     this.slumBalance = newBalance;
     return;
   }
 
   async subtractSlum(val) {
     let newBalance = this.userData.slum_amount - val;
-    await this.bank.setSlumBalance(this.id, newBalance);
+    await this.bank.addSlumBalance(this.id, val * -1);
     this.slumBalance = newBalance;
     return;
   }
