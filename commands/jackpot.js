@@ -11,7 +11,7 @@ module.exports = {
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('check')
-				.setDescription(`Check what the current jackpot value is in ${utils.Units.bank}.`))
+				.setDescription(`Check the current jackpot value.`))
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('bet')
@@ -38,12 +38,15 @@ module.exports = {
 			if (roll === 200) {
 				let jackpot = banker.bankBalance;
 				await userAccount.addBank(banker.userData.bank_amount);
+				await userAccount.addCasinoWinnings(banker.userData.bank_amount);
 				await banker.subtractBank(banker.userData.bank_amount);
 				response += `**Congratulations! <@${interaction.member.id}> just won the BIG POT of ${utils.Units.bankPrefix} ${jackpot}!!!**`
 			} else if (roll > 180) {
+				await userAccount.addCasinoLosses(betCost);
 				response += `🇱 So close... try again?`
 			} else {
-				response += `🇱 That's tough.. better luck next time.`
+				await userAccount.addCasinoLosses(betCost);
+				response += `🇱 That's tough... better luck next time.`
 			}
 			await interaction.reply({
 				content: response
