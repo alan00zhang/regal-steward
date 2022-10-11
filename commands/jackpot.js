@@ -2,7 +2,6 @@ const { SlashCommandBuilder } = require('discord.js');
 const utils = require('../utils.js');
 
 // The price of betting on a jackpot roll once
-const betCost = 10000;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -11,15 +10,17 @@ module.exports = {
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('check')
-				.setDescription(`Check the current jackpot value.`))
+				.setDescription(`Check the current jackpot value and the price of a chance at taking the whole damn thing.`))
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('bet')
-				.setDescription(`For ${betCost / 100} ${utils.Units.bank}, roll a number from 1-200 and hit 200 to win the ⭐JACKPOT⭐`)),
+				.setDescription(`Pay 1/200 of the jackpot, roll a number from 1-200 and hit 200 to win the ⭐JACKPOT⭐`)),
 	async execute(interaction, userAccount) {
 		const banker = await interaction.client.system.bank.getUserAccount("bank");
+		const betCost = banker.userData.bank_amount / 200;
 		if (interaction.options.getSubcommand() === "check") {
-			let response = `The jackpot is currently valued at ${utils.Units.bankPrefix} ${banker.bankBalance}. Will you take the gamble?`;
+			let response = `The jackpot is currently valued at ${utils.Units.bankPrefix} ${banker.bankBalance}. 
+			The cost of a jackpot bet is ${utils.Units.bankPrefix} ${(betCost / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}.`;
 			await interaction.reply({
 				content: response,
 				ephemeral: true
