@@ -17,7 +17,7 @@ module.exports = {
 				.setDescription(`Pay 1/200 of the jackpot, roll a number from 1-200 and hit 200 to win the ⭐JACKPOT⭐`)),
 	async execute(interaction, userAccount) {
 		const banker = await interaction.client.system.bank.getUserAccount("bank");
-		const betCost = banker.userData.bank_amount / 200;
+		const betCost = Number((banker.userData.bank_amount / 200).toFixed(2));
 		if (interaction.options.getSubcommand() === "check") {
 			let response = `The jackpot is currently valued at ${utils.Units.bankPrefix} ${banker.bankBalance}. 
 			The cost of a jackpot bet is ${utils.Units.bankPrefix} ${(betCost / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}.`;
