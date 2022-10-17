@@ -41,7 +41,7 @@ class MemeService {
           }
         }
 
-        await msg.awaitReactions({filter, time: 10000});
+        await msg.awaitReactions({filter, time: utils.Time.HOUR4 * 3});
         let pay = 0;
         let badMemeCount = 0;
 
