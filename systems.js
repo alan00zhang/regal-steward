@@ -4,6 +4,7 @@ const utils = require('./utils.js');
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 const { SalaryService } = require('./services/salary-service.js');
+const { MemeService } = require('./services/meme-service.js');
 
 class System {
   constructor() {
@@ -15,6 +16,7 @@ class System {
     this.client = client;
     this.client.system = this;
     this.Salary = new SalaryService(client);
+    this.Meme = new MemeService(client);
     return this;
   }
 
@@ -185,6 +187,14 @@ class Bank {
       console.error(error)
     }
   }
+
+  async addMemeEarnings(id, value) {
+    try {
+      return await this.db.run(`UPDATE users SET meme_earnings = meme_earnings + ? WHERE id = ?`, value, id);
+    } catch (error) {
+      console.error(error)
+    }
+  }
 }
 
 // The BankAccount class represents a single user's entry in the bank database
@@ -210,6 +220,14 @@ class BankAccount {
   set slumBalance(val) {
     this.userData.slum_amount = val;
   }
+
+  get memeEarnings() {
+    return this.userData.memeEarnings.toLocaleString(undefined, {minimumFractionDigits: 2});
+  }
+
+  set memeEarnings(val) {
+    this.userData.memeEarnings = val;
+  }
   
   get casinoWinnings() {
     return (this.userData.casino_winnings / 100).toLocaleString(undefined, {minimumFractionDigits: 2});
@@ -233,43 +251,50 @@ class BankAccount {
 
   async addBank(val) {
     let newBalance = this.userData.bank_amount + val;
-    await this.bank.addBankBalance(this.id, val);
     this.bankBalance = newBalance;
+    await this.bank.addBankBalance(this.id, val);
     return;
   }
 
   async subtractBank(val) {
     let newBalance = this.userData.bank_amount - val;
-    await this.bank.addBankBalance(this.id, val * -1);
     this.bankBalance = newBalance;
+    await this.bank.addBankBalance(this.id, val * -1);
     return;
   }
 
   async addCasinoWinnings(val) {
     let newBalance = this.userData.casino_winnings + val;
-    await this.bank.addCasinoWinnings(this.id, val);
     this.casinoWinnings = newBalance;
+    await this.bank.addCasinoWinnings(this.id, val);
     return;
   }
 
   async addCasinoLosses(val) {
     let newBalance = this.userData.casino_losses + val;
-    await this.bank.addCasinoLosses(this.id, val);
     this.casinoLosses = newBalance;
+    await this.bank.addCasinoLosses(this.id, val);
     return;
   }
 
   async addSlum(val) {
     let newBalance = this.userData.slum_amount + val;
-    await this.bank.addSlumBalance(this.id, val);
     this.slumBalance = newBalance;
+    await this.bank.addSlumBalance(this.id, val);
+    return;
+  }
+  
+  async subtractSlum(val) {
+    let newBalance = this.userData.slum_amount - val;
+    this.slumBalance = newBalance;
+    await this.bank.addSlumBalance(this.id, val * -1);
     return;
   }
 
-  async subtractSlum(val) {
-    let newBalance = this.userData.slum_amount - val;
-    await this.bank.addSlumBalance(this.id, val * -1);
-    this.slumBalance = newBalance;
+  async addMemeEarnings(val) {
+    let newBalance = this.userData.slum_amount + val;
+    this.memeEarnings = newBalance;
+    await this.bank.addMemeEarnings(this.id, val);
     return;
   }
 }

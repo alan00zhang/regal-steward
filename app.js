@@ -8,6 +8,8 @@ const intents = [
 	GatewayIntentBits.GuildMessages,
 	GatewayIntentBits.DirectMessages,
 	GatewayIntentBits.GuildMembers,
+	GatewayIntentBits.MessageContent,
+	GatewayIntentBits.GuildMessageReactions
 ]
 
 // Create a new client instance
@@ -22,6 +24,7 @@ client.once('ready', async () => {
 	await system.bank.open();
 	await system.bank.loadNewUsers();
 	system.Salary.service();
+	system.Meme.service();
 });
 
 client.on('interactionCreate', async interaction => {
