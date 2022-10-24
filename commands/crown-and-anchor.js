@@ -34,11 +34,31 @@ runGame = (interaction, collector, listenSuccess, bet) => {
     let banker = await interaction.client.system.bank.getUserAccount("bank");
 
     if (wins) {
-      let winAmount = (wins + 1) * bet.amount;
-      await Promise.all([
-        bet.userAccount.addBank(winAmount * 100),
-        bet.userAccount.addCasinoWinnings(winAmount * 100)
-      ]);
+      var winAmount;
+      switch (wins) {
+        case 1:
+          winAmount = bet.amount * 100;
+          await Promise.all([
+            bet.userAccount.addBank(winAmount),
+            bet.userAccount.addCasinoWinnings(winAmount)
+          ]);
+          break;
+
+        case 2:
+          winAmount = Math.round((bet.amount * 2.5 * 100));
+          await Promise.all([
+            bet.userAccount.addBank(winAmount),
+            bet.userAccount.addCasinoWinnings(winAmount)
+          ]);
+          break;
+
+        case 3:
+          winAmount = bet.amount * 5 * 100;
+          await Promise.all([
+            bet.userAccount.addBank(winAmount),
+            bet.userAccount.addCasinoWinnings(winAmount)
+          ]);
+      }
     } else {
       await Promise.all([
         bet.userAccount.subtractBank(bet.amount * 100),
@@ -48,7 +68,7 @@ runGame = (interaction, collector, listenSuccess, bet) => {
     }
 
     let finalResponse = `Your suit came up ${wins} times.\n`
-    finalResponse += wins ? `You won ${(wins + 1) * bet.amount} ${utils.Units.bank}!` : `You lose! You lose!`;
+    finalResponse += wins ? `You won ${(winAmount / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} ${utils.Units.bank}!` : `You lose! You lose!`;
     finalResponse += `\nYou have ${utils.Units.bankPrefix} ${bet.userAccount.bankBalance} left in your account.`
     await i.followUp({
       content: finalResponse,
@@ -56,7 +76,7 @@ runGame = (interaction, collector, listenSuccess, bet) => {
     });
 
     let announcement = wins 
-    ? `<@${i.member.id}> has won ${utils.Units.bankPrefix} ${(wins + 1) * bet.amount} playing Crown and Anchor!` 
+    ? `<@${i.member.id}> has won ${utils.Units.bankPrefix} ${(winAmount / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} playing Crown and Anchor!` 
     : `<@${i.member.id}> has lost ${utils.Units.bankPrefix} ${bet.amount} playing Crown and Anchor!`;
     announcement += `\n\nThere is ${utils.Units.bankPrefix} ${banker.bankBalance} in the jackpot.`
     i.channel.send(announcement)
