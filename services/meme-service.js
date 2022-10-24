@@ -13,7 +13,9 @@ class MemeService {
 
   async receiveMeme() {
     this.client.on("messageCreate", async (msg) => {
-      if (msg.channel.name === "memes" && !msg.member.user.bot && (msg.embeds.length || msg.attachments.size)) {
+      if (msg.channel.name === "memes" 
+      && !msg.member.user.bot 
+      && (msg.embeds.length || msg.attachments.size || msg.content.includes("https://") || msg.content.includes("http://"))) {
         const userAccount = await this.bank.getUserAccount(msg.member.id);
         const catJAM = msg.guild.emojis.cache.find(emoji => emoji.name === 'catJAM');
         const katy = msg.guild.emojis.cache.find(emoji => emoji.name === 'katy');
