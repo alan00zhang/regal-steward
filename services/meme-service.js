@@ -41,7 +41,7 @@ class MemeService {
           }
         }
 
-        await msg.awaitReactions({filter, time: utils.Time.HOUR4 * 3});
+        await msg.awaitReactions({filter, time: utils.Time.HOUR8});
         let pay = 0;
         let badMemeCount = 0;
 
@@ -70,11 +70,15 @@ class MemeService {
           msg.channel.send({
             content: `<@${msg.member.id}>, thank you for your contribution to the economy.\nYou have been fined ${utils.Units.bankPrefix} ${(pay / -100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your BAD meme.`
           });
-        } else if (pay === 0) {
+        } else if (reactions.length === 0) {
           msg.channel.send({
             content: `<@${msg.member.id}>, thank you for your contribution to the economy. Unfortunately no one was engaged with your meme.\nYou have been paid ${utils.Units.bankPrefix} 50.00 out of pity.`
           });
           await userAccount.addMemeEarnings(5000);
+        } else if (pay === 0) {
+          msg.channel.send({
+            content: `<@${msg.member.id}>, thank you for your contribution to the economy. You will receive nothing for your NEUTRAL meme.`
+          });
         }
         await userAccount.addMemeEarnings(pay);
       }
