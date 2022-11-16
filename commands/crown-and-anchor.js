@@ -77,7 +77,7 @@ runGame = (interaction, collector, listenSuccess, bet) => {
 
     let announcement = wins 
     ? `<@${i.member.id}> has won ${utils.Units.bankPrefix} ${(winAmount / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} playing Crown and Anchor!` 
-    : `<@${i.member.id}> has lost ${utils.Units.bankPrefix} ${bet.amount} playing Crown and Anchor!`;
+    : `<@${i.member.id}> has lost ${utils.Units.bankPrefix} ${Number(bet.amount).toLocaleString(undefined, {minimumFractionDigits: 2})} playing Crown and Anchor!`;
     announcement += `\n\nThere is ${utils.Units.bankPrefix} ${banker.bankBalance} in the jackpot.`
     i.channel.send(announcement)
   }
