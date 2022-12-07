@@ -17,7 +17,7 @@ module.exports = {
 				.setDescription(`Pay 1/200 of the jackpot, roll a number from 1-200 and hit 200 to win the ⭐JACKPOT⭐`)),
 	async execute(interaction, userAccount) {
 		const banker = await interaction.client.system.bank.getUserAccount("bank");
-		const betCost = Math.round((banker.userData.bank_amount / 200));
+		let betCost = Math.round((banker.userData.bank_amount / 200));
 		// cap the betCost at 2000000
 		if (betCost > 2000000) betCost = 2000000;
 		if (interaction.options.getSubcommand() === "check") {
