@@ -18,8 +18,10 @@ module.exports = {
 	async execute(interaction, userAccount) {
 		const banker = await interaction.client.system.bank.getUserAccount("bank");
 		const betCost = Math.round((banker.userData.bank_amount / 200));
+		// cap the betCost at 2000000
+		if (betCost > 2000000) betCost = 2000000;
 		if (interaction.options.getSubcommand() === "check") {
-			let response = `The jackpot is currently valued at ${utils.Units.bankPrefix} ${banker.bankBalance}. 
+			let response = `The jackpot is currently valued at ${utils.Units.bankPrefix} ${banker.bankBalance}.
 			The cost of a jackpot bet is ${utils.Units.bankPrefix} ${(betCost / 100).toLocaleString(undefined, {minimumFractionDigits: 2})}.`;
 			await interaction.reply({
 				content: response,

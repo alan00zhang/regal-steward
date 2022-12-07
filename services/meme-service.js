@@ -50,17 +50,17 @@ class MemeService {
         for (let reaction of reactions) {
           switch (reaction.emoji) {
             case catJAM:
-              pay += 50000;
+              pay += 500000;
               break;
             case katy:
-              pay += 20000;
+              pay += 200000;
               break;
             case eggboy:
-              pay -= 10000;
+              pay -= 100000;
               break;
             case sham:
               badMemeCount++;
-              pay -= 20000;
+              pay -= 200000;
               break;
           }
         }

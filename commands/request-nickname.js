@@ -8,7 +8,7 @@ fetchApprovers = async function(interaction) {
 	const options = [];
 	const members = await interaction.guild.members.fetch();
 	const approvers = members.filter(member => {
-		return member.roles.cache.find(role => role.name === "Nobility");
+		// return member.roles.cache.find(role => role.name === "Nobility");
 		// comment above code to switch the approvers
 		// from only "Nobility" to all members who are higher in rank
 		return member.roles.highest.comparePositionTo(interaction.member.roles.highest) > 0;
