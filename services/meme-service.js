@@ -16,7 +16,8 @@ class MemeService {
       if (msg.channel.name === "memes" 
       && !msg.member.user.bot 
       && (msg.embeds.length || msg.attachments.size || msg.content.includes("https://") || msg.content.includes("http://"))) {
-        const userAccount = await this.bank.getUserAccount(msg.member.id);
+        const memberId = msg.member.id;
+        const userAccount = await this.bank.getUserAccount(memberId);
         const catJAM = msg.guild.emojis.cache.find(emoji => emoji.name === 'catJAM');
         const katy = msg.guild.emojis.cache.find(emoji => emoji.name === 'katy');
         const eggboy = msg.guild.emojis.cache.find(emoji => emoji.name === 'eggboy');
@@ -66,20 +67,20 @@ class MemeService {
         }
         if (pay > 0) {
           msg.channel.send({
-            content: `<@${msg.member.id}>, thank you for your contribution to the economy.\nYou have earned ${utils.Units.bankPrefix} ${(pay / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your GOOD meme.`
+            content: `<@${memberId}>, thank you for your contribution to the economy.\nYou have earned ${utils.Units.bankPrefix} ${(pay / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your GOOD meme.`
           });
         } else if (pay < 0) {
           msg.channel.send({
-            content: `<@${msg.member.id}>, thank you for your contribution to the economy.\nYou have been fined ${utils.Units.bankPrefix} ${(pay / -100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your BAD meme.`
+            content: `<@${memberId}>, thank you for your contribution to the economy.\nYou have been fined ${utils.Units.bankPrefix} ${(pay / -100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your BAD meme.`
           });
         } else if (reactions.length === 0) {
           msg.channel.send({
-            content: `<@${msg.member.id}>, thank you for your contribution to the economy. Unfortunately no one was engaged with your meme.\nYou have been paid ${utils.Units.bankPrefix} 50.00 out of pity.`
+            content: `<@${memberId}>, thank you for your contribution to the economy. Unfortunately no one was engaged with your meme.\nYou have been paid ${utils.Units.bankPrefix} 50.00 out of pity.`
           });
           await userAccount.addMemeEarnings(5000);
         } else if (pay === 0) {
           msg.channel.send({
-            content: `<@${msg.member.id}>, thank you for your contribution to the economy. You will receive nothing for your NEUTRAL meme.`
+            content: `<@${memberId}>, thank you for your contribution to the economy. You will receive nothing for your NEUTRAL meme.`
           });
         }
         await userAccount.addMemeEarnings(pay);
