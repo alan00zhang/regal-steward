@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Routes, Collection, Embed, ActionRowBuilder, SelectMenuBuilder } = require('discord.js');
+const { Routes, Collection, Embed, ActionRowBuilder, SelectMenuBuilder, TextInputBuilder } = require('discord.js');
 
 const getCommands = function(client) {
   client.commands = new Collection();
@@ -50,7 +50,7 @@ const initSingletonCommand = async function(interaction, system) {
 }
 
 const createSelectMenu = function(customId, options, placeholder) {
-  let selectMenu = new SelectMenuBuilder()
+  let selectMenu = new SelectMenuBuilder();
   selectMenu.setCustomId(customId);
   selectMenu.addOptions(...options);
   if (placeholder) selectMenu.setPlaceholder(placeholder);
@@ -58,12 +58,21 @@ const createSelectMenu = function(customId, options, placeholder) {
 }
 
 const createUpdatedSelectMenu = function(customId, options, selectedValue) {
-  let newOptions = structuredClone(options)
-  let selectedOption = newOptions.find(option => option.value === selectedValue)
+  let newOptions = structuredClone(options);
+  let selectedOption = newOptions.find(option => option.value === selectedValue);
   selectedOption.default = true;
 
   // reconstruct the select menu, this time updating the selected value
   return createSelectMenu(customId, newOptions);
+}
+
+const createInputField = function(customId, placeholder, min, max) {
+  let inputField = new TextInputBuilder();
+  inputField.setCustomId(customId);
+  inputField.setPlaceholder(placeholder);
+  if (min !== undefined) inputField.setMinValue(min);
+  if (max !== undefined) inputField.setMaxValue(max);
+  return new ActionRowBuilder().addComponents(inputField);
 }
 
 const Time = {
@@ -86,5 +95,5 @@ const Units = {
 }
 
 module.exports = {
-  getCommands, guardReply, initSingletonCommand, createSelectMenu, createUpdatedSelectMenu, Time, Units
+  getCommands, guardReply, initSingletonCommand, createSelectMenu, createUpdatedSelectMenu, createInputField, Time, Units
 }
