@@ -1,8 +1,8 @@
 require('dotenv').config({path: __dirname});
-const systemsJs = require('./systems.js');
-const sqlite3 = require('sqlite3').verbose();
-const { Client, GatewayIntentBits } = require('discord.js');
-const { getCommands } = require('./utils')
+import * as syslib from './systems';
+import sqlite3 from 'sqlite3';
+import { ApplicationCommand, Client, GatewayIntentBits, GuildMember } from 'discord.js';
+import { AppCommand, getCommands } from './utils';
 const intents = [
 	GatewayIntentBits.Guilds,
 	GatewayIntentBits.GuildMessages,
@@ -13,10 +13,11 @@ const intents = [
 ]
 
 // Create a new client instance
-const client = new Client({ intents: intents });
+const client: Client = new Client({ intents: intents });
 // Use the system singleton in systemsJs so other files can use the same system without forming circular dependencies
-const system = systemsJs.system.attachClient(client);
-getCommands(client);
+const system = new syslib.System(client)
+system.initServices()
+const commands = getCommands();
 
 // When the client is ready, run this code (only once)
 client.once('ready', async () => {
@@ -29,12 +30,11 @@ client.once('ready', async () => {
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
-	const command = interaction.client.commands.get(interaction.commandName);
+	const command: AppCommand = commands.get(interaction.commandName);
 	if (!command) return;
-	
 	try {
-		let userAccount = await system.bank.getUserAccount(interaction.member.id)
-		await command.execute(interaction, userAccount);
+		let userBankAccount = await system.bank.getUserAccount((<GuildMember>interaction.member).id)
+		await command.execute(interaction, system, userBankAccount);
 	} catch (error) {
 		// Disconnect from the database
 		await system.bank.close();

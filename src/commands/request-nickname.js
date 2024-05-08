@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const utils = require('../utils.js');
-const systemsJs = require('../systems.js');
+const systemsJs = require('../systems.js').default;
 const commandName = "request-nickname";
 
 fetchApprovers = async function(interaction) {

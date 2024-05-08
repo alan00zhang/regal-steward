@@ -90,5 +90,5 @@ class MemeService {
 }
 
 module.exports = {
-  MemeService: MemeService
+  MemeService
 }
