@@ -1,6 +1,7 @@
-require('dotenv').config();
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord.js');
+import * as dotenv from "dotenv";
+dotenv.config({path: '.env'});
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord.js';
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 const commandId = 1021561643097931906n;

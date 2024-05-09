@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, SelectMenuBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-const systemsJs = require('../systems.js').default;
+const systemsJs = require('../systems/systems.js').default;
 const utils = require('../utils.js');
 
 const commandName = "crown-and-anchor";

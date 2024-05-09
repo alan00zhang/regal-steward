@@ -1,6 +1,7 @@
 import { Client, TextChannel } from "discord.js";
 import { Utils } from "../utils.js";
-import { Bank, System } from "../systems.js";
+import { System } from "../systems/systems.js";
+import { Bank } from "../systems/bank.js";
 
 export class MemeService {
   client: Client;

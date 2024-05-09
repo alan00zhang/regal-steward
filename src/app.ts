@@ -5,9 +5,8 @@ const __dirname = dirname(__filename);
 
 import * as dotenv from "dotenv";
 dotenv.config({path: __dirname + '/.env'});
-import { System } from './systems.js';
-import sqlite3 from 'sqlite3';
-import { ApplicationCommand, Client, GatewayIntentBits, GuildMember } from 'discord.js';
+import { System } from './systems/systems.js';
+import { Client, GatewayIntentBits, GuildMember } from 'discord.js';
 import { AppCommand, Utils } from './utils.js';
 
 const intents = [
@@ -30,7 +29,7 @@ client.once('ready', async () => {
 	console.log('Ready!');
 	await system.bank.open();
 	await system.bank.loadNewUsers();
-	// system.Salary.service();
+	system.Salary.service();
 	// system.Meme.service();
 });
 
@@ -39,8 +38,7 @@ client.on('interactionCreate', async interaction => {
 	const command: AppCommand = Utils.getCommand(interaction.commandName);
 	if (!command) return;
 	try {
-		let userBankAccount = await system.bank.getUserAccount((<GuildMember>interaction.member).id)
-		await command.execute(interaction, system, userBankAccount);
+		await command.execute(interaction, system);
 	} catch (error) {
 		// Disconnect from the database
 		await system.bank.close();

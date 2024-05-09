@@ -22,14 +22,7 @@ const allResponses = [
 	...negativeResponses, ...positiveResponses, ...unsureResponses
 ]
 
-export const magic_8ball: AppCommand = {
-	data: new SlashCommandBuilder()
-		.setName('magic-8-ball')
-		.setDescription('Ask the all-knowing and receive truth unbound')
-		.addStringOption((option: any) => 
-			option.setName("question")
-				.setDescription("What do you seek?")
-				.setRequired(false)),
+export const Magic8Ball: AppCommand = {
 	async execute(interaction: ChatInputCommandInteraction) {
     let randomIndex = Math.floor(Math.random() * allResponses.length);
 		let response = "";

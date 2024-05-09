@@ -1,5 +1,6 @@
 import { Client } from 'discord.js';
-import { System, Bank } from '../systems.js';
+import { System } from '../systems/systems.js';
+import { Bank } from '../systems/bank.js';
 import { Utils } from '../utils.js';
 
 export class SalaryService {
@@ -17,12 +18,13 @@ export class SalaryService {
     this.paySalaries();
     setInterval(() => {
       this.paySalaries();
-    }, Utils.Time.DAY1);
+    }, Utils.Time.MINUTE30);
   }
 
   async paySalaries() {
-    let responseTable = await this.bank.db.get("SELECT date_paid == date() FROM salary_log ORDER BY paycheque_id DESC LIMIT 1");
-    if (responseTable?.["date_paid == date()"]) {
+    let currentHour = new Date().getHours();
+    let responseTable = await this.bank.db.get(`SELECT * FROM salary_log WHERE date_paid=date() & hour_paid=${currentHour} LIMIT 1`);
+    if (responseTable !== undefined) {
       return;
     };
     let existingUsers = await this.bank.getAllUserIds();
@@ -38,13 +40,13 @@ export class SalaryService {
       WHERE id != "bank";
       COMMIT;`
     )
-    await this.logSalariesPaid(userAccounts);
+    await this.logSalariesPaid(userAccounts, currentHour);
   }
 
-  async logSalariesPaid(userAccounts: any[]) {
+  async logSalariesPaid(userAccounts: any[], hour: number) {
     let stmts = ``
     for (let userAccount of userAccounts) {
-      stmts += `INSERT INTO salary_log(id, amount_paid) VALUES (${userAccount.id}, ${userAccount.userData.salary});`
+      stmts += `INSERT INTO salary_log(id, amount_paid, hour_paid) VALUES (${userAccount.id}, ${userAccount.userData.salary}, ${hour});`
     }
     return this.bank.db.exec(
       `BEGIN TRANSACTION;
