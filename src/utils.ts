@@ -5,14 +5,7 @@ import { System } from './systems/systems.js';
 import { BankAccount } from './systems/bank.js';
 import { Magic8Ball } from './commands/magic-8-ball.js';
 import { CommandCheckBalance } from './commands/check-balance.js';
-
-export type AppCommand = {
-  execute: (interaction: ChatInputCommandInteraction, system: System) => any
-}
-
-export type KeyValuePair<T> = {
-  [key: string]: T
-}
+import { KeyValuePair, AppCommand } from './types.js';
 
 export class Utils {
   // Add your command to this list in order to activate your command
@@ -60,6 +53,10 @@ export class Utils {
     if (min !== undefined) inputField.setMinLength(min);
     if (max !== undefined) inputField.setMaxLength(max);
     return new ActionRowBuilder().addComponents(inputField);
+  }
+
+  static formatCurrency(val: number) {
+    return (val / 100).toLocaleString(undefined, { minimumFractionDigits: 2 });
   }
 
   static Time = {

@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, GuildMember, SlashCommandBuilder } from 'discord.js';
-import { AppCommand, Utils } from '../utils.js';
+import { Utils } from '../utils.js';
 import { System } from '../systems/systems.js';
+import { AppCommand } from '../types.js';
 
 export const CommandCheckBalance: AppCommand = {
 	async execute(interaction: ChatInputCommandInteraction, system: System) {

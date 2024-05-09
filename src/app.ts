@@ -7,7 +7,8 @@ import * as dotenv from "dotenv";
 dotenv.config({path: __dirname + '/.env'});
 import { System } from './systems/systems.js';
 import { Client, GatewayIntentBits, GuildMember } from 'discord.js';
-import { AppCommand, Utils } from './utils.js';
+import { Utils } from './utils.js';
+import { AppCommand } from './types.js';
 
 const intents = [
 	GatewayIntentBits.Guilds,

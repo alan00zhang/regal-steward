@@ -1,7 +1,8 @@
 import { System } from '../systems/systems.js';
 import { SlashCommandBuilder, ChatInputCommandInteraction, GuildMember } from 'discord.js';
-import { AppCommand, Utils } from '../utils.js';
+import { Utils } from '../utils.js';
 import { BankAccount } from '../systems/bank.js';
+import { AppCommand } from '../types.js';
 
 export const CommandTip: AppCommand = {
 	async execute(interaction: ChatInputCommandInteraction, system: System) {
