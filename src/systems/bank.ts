@@ -124,7 +124,11 @@ export class BankAccount {
     this.userData = data;
   }
 
-  get bankBalance(): string {
+  get bankBalance(): number {
+    return this.userData.bank_amount / 100;
+  }
+
+  get bankBalanceString(): string {
     return (this.userData.bank_amount / 100).toLocaleString(undefined, {minimumFractionDigits: 2});
   }
 
@@ -132,23 +136,35 @@ export class BankAccount {
     this.userData.bank_amount = val;
   }
 
-  get memeEarnings(): string {
+  get memeEarnings(): number {
+    return this.userData.meme_earnings / 100;
+  }
+
+  get memeEarningsString(): string {
     return this.userData.meme_earnings.toLocaleString(undefined, {minimumFractionDigits: 2});
   }
 
   set memeEarnings(val: number) {
     this.userData.meme_earnings = val;
   }
+
+  get casinoWinnings(): number {
+    return this.userData.casino_winnings / 100;
+  }
   
-  get casinoWinnings(): string {
+  get casinoWinningsString(): string {
     return (this.userData.casino_winnings / 100).toLocaleString(undefined, {minimumFractionDigits: 2});
   }
 
   set casinoWinnings(val: number) {
     this.userData.casino_winnings = val;
   }
+
+  get casinoLosses(): number {
+    return this.userData.casino_losses / 100;
+  }
   
-  get casinoLosses(): string {
+  get casinoLossesString(): string {
     return (this.userData.casino_losses / 100).toLocaleString(undefined, {minimumFractionDigits: 2});
   }
 
