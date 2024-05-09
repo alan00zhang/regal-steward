@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction } from "discord.js";
-import { AppCommand } from "../utils";
+import { AppCommand } from "../utils.js";
+import { SlashCommandBuilder } from 'discord.js';
 
-const { SlashCommandBuilder } = require('discord.js');
 const negativeResponses = [
 	"Don’t count on it.", "My reply is no.", "My sources say no.",
 	"Outlook not so good.",	"Very doubtful."

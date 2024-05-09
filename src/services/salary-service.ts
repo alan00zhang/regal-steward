@@ -1,17 +1,23 @@
-const utils = require('../utils.js');
+import { Client } from 'discord.js';
+import { System, Bank } from '../systems.js';
+import { Utils } from '../utils.js';
 
-class SalaryService {
-  constructor(client) {
-    this.client = client;
-    this.system = client.system;
-    this.bank = client.system.bank;
+export class SalaryService {
+  client: Client;
+  system: System;
+  bank: Bank;
+  
+  constructor(system: System) {
+    this.client = system.client;
+    this.system = system;
+    this.bank = system.bank;
   }
 
   service() {
     this.paySalaries();
     setInterval(() => {
       this.paySalaries();
-    }, utils.Time.DAY1);
+    }, Utils.Time.DAY1);
   }
 
   async paySalaries() {
@@ -35,7 +41,7 @@ class SalaryService {
     await this.logSalariesPaid(userAccounts);
   }
 
-  async logSalariesPaid(userAccounts) {
+  async logSalariesPaid(userAccounts: any[]) {
     let stmts = ``
     for (let userAccount of userAccounts) {
       stmts += `INSERT INTO salary_log(id, amount_paid) VALUES (${userAccount.id}, ${userAccount.userData.salary});`
@@ -46,8 +52,4 @@ class SalaryService {
       COMMIT;`
       )
   }
-}
-
-module.exports = {
-  SalaryService
 }

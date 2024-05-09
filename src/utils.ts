@@ -1,11 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { Routes, Collection, Embed, ActionRowBuilder, SelectMenuBuilder, TextInputBuilder, Client, SlashCommandBuilder, ChatInputCommandInteraction, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
-import { BankAccount, System } from './systems';
-import { magic_8ball } from './commands/magic-8-ball';
+import { Routes, Collection, Embed, ActionRowBuilder, SelectMenuBuilder, TextInputBuilder, Client, SlashCommandBuilder, ChatInputCommandInteraction, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandOptionsOnlyBuilder } from 'discord.js';
+import { BankAccount, System } from './systems.js';
+import { magic_8ball } from './commands/magic-8-ball.js';
 
 export type AppCommand = {
-  data: SlashCommandBuilder;
+  data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;
   execute: (interaction: ChatInputCommandInteraction, system: System, userAccount?: BankAccount) => any
 }
 

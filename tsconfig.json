@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "moduleResolution": "Node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "allowJs": true,
     "esModuleInterop": true,
     "outDir": "./dist",

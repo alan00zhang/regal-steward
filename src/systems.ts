@@ -1,10 +1,17 @@
-require('dotenv').config();
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+import * as dotenv from "dotenv";
+dotenv.config({path: __dirname + '/.env'});
 import { ButtonInteraction, ChatInputCommandInteraction, Client, GatewayIntentBits } from 'discord.js';
 import sqlite3 from 'sqlite3';
 import { Database, IMigrate, ISqlite, open } from 'sqlite';
 import { SalaryService } from './services/salary-service.js';
 import { MemeService } from './services/meme-service.js';
 import { UserAccount } from './types.js';
+import { KeyValuePair } from './utils.js';
 
 export type UniqueItem<T>= {
   id: string,
@@ -24,8 +31,8 @@ export class System {
   }
   
   initServices() {
-    this.Salary = new SalaryService(this.client);
-    this.Meme = new MemeService(this.client);
+    this.Salary = new SalaryService(this);
+    this.Meme = new MemeService(this);
     return;
   }
 
@@ -166,7 +173,7 @@ export class Bank {
 
   async getAllUserIds() {
     let temp = await this.db.all("SELECT CAST(id as text) FROM users");
-    return temp.map(user => user["CAST(id as text)"]);
+    return temp.map(user => user["CAST(id as text)"]) as string[];
   }
 
   async getCasinoLeaderboards() {
@@ -175,7 +182,7 @@ export class Bank {
 
   async loadNewUsers() { // TODO split each guild into its own table or schema in db
     let existingUsers = await this.getAllUserIds();
-    let newUsers: any[] = []; // TODO Type users
+    let newUsers: KeyValuePair<string>[] = [];
     const guilds = await this.system.client.guilds.fetch();
     for (let [guildSnowflake, oauthGuild] of guilds) {
       let guild = await oauthGuild.fetch();
@@ -195,7 +202,7 @@ export class Bank {
 
       // check for SQL injection
       let injectionAttempt = false;
-      if (newUsers[i].username.include("DROP TABLE")) {
+      if (newUsers[i].username.includes("DROP TABLE")) {
         injectionAttempt = true;
         continue;
       }
