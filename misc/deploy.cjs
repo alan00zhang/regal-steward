@@ -14,5 +14,23 @@ module.exports = {
     data: new SlashCommandBuilder()
 		.setName('check-balance')
 		.setDescription('Check your bank account balance.')
+  },
+  'casino-leaderboards': {
+    data: new SlashCommandBuilder()
+    .setName('casino-leaderboards')
+    .setDescription('Check out the casino leaderboard Top 5'),
+  },
+  'jackpot': {
+    data: new SlashCommandBuilder()
+		.setName('jackpot')
+		.setDescription('Check the current jackpot value OR make a bet to take the whole damn thing.')
+		.addSubcommand(subcommand =>
+			subcommand
+				.setName('check')
+				.setDescription(`Check the current jackpot value and the price of a chance at scoring the big one.`))
+		.addSubcommand(subcommand =>
+			subcommand
+				.setName('bet')
+				.setDescription(`Pay 1/100 of the jackpot, roll a number from 1-100 and hit 100 to win the ⭐JACKPOT⭐`))
   }
 }
