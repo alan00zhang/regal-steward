@@ -15,6 +15,7 @@
   ],
   "author": "",
   "license": "ISC",
+  "type": "module",
   "dependencies": {
     "@discordjs/rest": "^1.1.0",
     "@types/node": "^20.12.10",

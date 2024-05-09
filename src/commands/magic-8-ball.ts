@@ -1,3 +1,6 @@
+import { ChatInputCommandInteraction } from "discord.js";
+import { AppCommand } from "../utils";
+
 const { SlashCommandBuilder } = require('discord.js');
 const negativeResponses = [
 	"Don’t count on it.", "My reply is no.", "My sources say no.",
@@ -19,15 +22,15 @@ const allResponses = [
 	...negativeResponses, ...positiveResponses, ...unsureResponses
 ]
 
-module.exports = {
+export const magic_8ball: AppCommand = {
 	data: new SlashCommandBuilder()
 		.setName('magic-8-ball')
 		.setDescription('Ask the all-knowing and receive truth unbound')
-		.addStringOption(option => 
+		.addStringOption((option: any) => 
 			option.setName("question")
 				.setDescription("What do you seek?")
 				.setRequired(false)),
-	async execute(interaction) {
+	async execute(interaction: ChatInputCommandInteraction) {
     let randomIndex = Math.floor(Math.random() * allResponses.length);
 		let response = "";
 		let question = interaction.options.getString("question");

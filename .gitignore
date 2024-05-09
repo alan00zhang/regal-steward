@@ -4,3 +4,4 @@ config.json
 .vscode
 notes.txt
 regal-steward.db
+dist

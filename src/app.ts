@@ -2,7 +2,7 @@ require('dotenv').config({path: __dirname});
 import * as syslib from './systems';
 import sqlite3 from 'sqlite3';
 import { ApplicationCommand, Client, GatewayIntentBits, GuildMember } from 'discord.js';
-import { AppCommand, getCommands } from './utils';
+import { AppCommand, Utils } from './utils';
 const intents = [
 	GatewayIntentBits.Guilds,
 	GatewayIntentBits.GuildMessages,
@@ -16,8 +16,7 @@ const intents = [
 const client: Client = new Client({ intents: intents });
 // Use the system singleton in systemsJs so other files can use the same system without forming circular dependencies
 const system = new syslib.System(client)
-system.initServices()
-const commands = getCommands();
+system.initServices();
 
 // When the client is ready, run this code (only once)
 client.once('ready', async () => {
@@ -30,7 +29,7 @@ client.once('ready', async () => {
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
-	const command: AppCommand = commands.get(interaction.commandName);
+	const command: AppCommand = Utils.getCommand(interaction.commandName);
 	if (!command) return;
 	try {
 		let userBankAccount = await system.bank.getUserAccount((<GuildMember>interaction.member).id)
