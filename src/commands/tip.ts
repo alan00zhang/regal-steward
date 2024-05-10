@@ -6,7 +6,7 @@ import { AppCommand } from '../types.js';
 
 export const CommandTip: AppCommand = {
 	async execute(interaction: ChatInputCommandInteraction, system: System) {
-    let bankAccount: BankAccount = await system.bank.getUserAccount(interaction.id);
+    let bankAccount = await system.bank.getUserAccount((<GuildMember>interaction.member).id);
     const tip = Math.round(interaction.options.getNumber("amount") * 1e2) / 1e2;
     const tippee = interaction.options.getUser("recipient");
 

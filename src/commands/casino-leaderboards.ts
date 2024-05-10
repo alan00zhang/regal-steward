@@ -1,11 +1,9 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Utils } from '../utils.js';
 import { System } from '../systems/systems.js';
+import { AppCommand } from '../types.js';
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('casino-leaderboards')
-		.setDescription('Check out the casino leaderboard Top 5'),
+export const CommandCasinoLeaderboards: AppCommand = {
 	async execute(interaction: ChatInputCommandInteraction, system: System) {
     let leaderboards = await system.bank.getCasinoLeaderboards();
     let top5 = leaderboards.slice(0, 5);
