@@ -59,7 +59,6 @@ export class Utils {
 
   static Units = {
     bank: "Emporeum",
-    bankPrefix: "**𝔼**",
-    slum: "SlumCoin"
+    bankPrefix: "**𝔼**"
   }
 }

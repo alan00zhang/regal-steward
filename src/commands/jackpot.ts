@@ -10,13 +10,12 @@ export const CommandJackpot: AppCommand = {
 	async execute(interaction: ChatInputCommandInteraction, system: System) {
 		let bankAccount = await system.bank.getUserAccount((<GuildMember>interaction.member).id);
 		const banker = await system.bank.getUserAccount("bank");
-		console.log(banker)
 		let betCost = Math.round(banker.bankBalance) / 100;
 		// cap the betCost at 100,000.00
 		if (betCost > 100000.00) betCost = 100000.00;
 		if (interaction.options.getSubcommand() === "check") {
 			let response = `The jackpot is currently valued at ${Utils.Units.bankPrefix} ${banker.bankBalanceString}.
-			The cost of a jackpot bet is ${Utils.Units.bankPrefix} ${betCost}.`;
+			The cost of a jackpot bet is ${Utils.Units.bankPrefix} ${Utils.formatCurrency(betCost * 100)}.`;
 			await interaction.reply({
 				content: response,
 				ephemeral: true
