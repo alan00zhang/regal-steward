@@ -36,7 +36,7 @@ client.once('ready', async () => {
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
-	const command: AppCommand = Utils.getCommand(interaction.commandName);
+	const command: AppCommand = system.getCommand(interaction.commandName);
 	if (!command) return;
 	try {
 		await command.execute(interaction, system);

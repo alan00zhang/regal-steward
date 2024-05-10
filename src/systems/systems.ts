@@ -8,7 +8,13 @@ dotenv.config({path: __dirname + '/.env'});
 import { ButtonInteraction, ChatInputCommandInteraction, Client, GatewayIntentBits } from 'discord.js';
 import { SalaryService } from '../services/salary-service.js';
 import { MemeService } from '../services/meme-service.js';
-import { Bank } from './bank.js';
+import { Bank, BankAccount } from './bank.js';
+import { CommandCrystalBall } from '../commands/magic-8-ball.js';
+import { CommandCheckBalance } from '../commands/check-balance.js';
+import { KeyValuePair, AppCommand } from '../types.js';
+import { CommandJackpot } from '../commands/jackpot.js';
+import { CommandCasinoLeaderboards } from '../commands/casino-leaderboards.js';
+import { CommandTip } from '../commands/tip.js';
 
 export type UniqueItem<T>= {
   id: string,
@@ -20,11 +26,24 @@ export class System {
   dbActiveEvents: UniqueSystemDatabase<string>;
   Salary: SalaryService;
   Meme: MemeService;
+  
+  // Add your command to this list in order to activate your command
+  private commandMapping: KeyValuePair<AppCommand> = {
+    'magic-8-ball': CommandCrystalBall,
+    'check-balance': CommandCheckBalance,
+    'jackpot': CommandJackpot,
+    'casino-leaderboards': CommandCasinoLeaderboards,
+    'tip': CommandTip
+  }
 
   constructor(client: Client) {
     this.dbActiveEvents = <UniqueSystemDatabase<string>>this.createDB<any>("activeEvents", "unique"); // type activeEvents?
     this.bank = new Bank(this);
     this.client = client;
+  }
+
+  getCommand(commandName: string) {
+    return this.commandMapping[commandName];
   }
   
   initServices() {

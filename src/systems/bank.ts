@@ -18,6 +18,7 @@ export class Bank {
       filename: './regal-steward.db',
       driver: sqlite3.Database
     });
+    await this.loadBanker();
   }
 
   async close() {
@@ -40,6 +41,19 @@ export class Bank {
 
   async getCasinoLeaderboards() {
     return await this.db.all(`SELECT CAST(id as text), casino_winnings, casino_losses FROM users ORDER BY casino_winnings DESC, bank_amount DESC`) as KeyValuePair<string | number>[];
+  }
+
+  async loadBanker() {
+    try {
+      let banker = await this.db.get<UserAccount>("SELECT * FROM users WHERE id = 'bank'");
+      if (banker === undefined) {
+        this.db.run("INSERT INTO users(id) VALUES ('bank')")
+      }
+      return !!banker;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   async loadNewUsers() { // TODO split each guild into its own table or schema in db

@@ -22,7 +22,7 @@ const allResponses = [
 	...negativeResponses, ...positiveResponses, ...unsureResponses
 ]
 
-export const Magic8Ball: AppCommand = {
+export const CommandCrystalBall: AppCommand = {
 	async execute(interaction: ChatInputCommandInteraction) {
     let randomIndex = Math.floor(Math.random() * allResponses.length);
 		let response = "";

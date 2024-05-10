@@ -1,23 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { Routes, Collection, Embed, ActionRowBuilder, SelectMenuBuilder, TextInputBuilder, Client, SlashCommandBuilder, ChatInputCommandInteraction, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandOptionsOnlyBuilder } from 'discord.js';
-import { System } from './systems/systems.js';
-import { BankAccount } from './systems/bank.js';
-import { Magic8Ball } from './commands/magic-8-ball.js';
-import { CommandCheckBalance } from './commands/check-balance.js';
-import { KeyValuePair, AppCommand } from './types.js';
 
 export class Utils {
-  // Add your command to this list in order to activate your command
-  private static commandMapping: KeyValuePair<AppCommand> = {
-    'magic-8-ball': Magic8Ball,
-    'check-balance': CommandCheckBalance
-  }
-
-  static getCommand(commandName: string) {
-    return this.commandMapping[commandName];
-  }
-  
   static createSelectOptions(options: string[]) {
     let builders = [];
     for (let option of options) {

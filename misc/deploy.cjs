@@ -1,5 +1,13 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+const utils = {
+  Units: {
+    bank: "Emporeum",
+    bankPrefix: "**𝔼**",
+    slum: "SlumCoin"
+  }
+}
+
 module.exports = {
   'magic-8-ball': {
     data: new SlashCommandBuilder()
@@ -32,5 +40,18 @@ module.exports = {
 			subcommand
 				.setName('bet')
 				.setDescription(`Pay 1/100 of the jackpot, roll a number from 1-100 and hit 100 to win the ⭐JACKPOT⭐`))
+  },
+  'tip': {
+    data: new SlashCommandBuilder()
+		.setName('tip')
+		.setDescription(`Tip someone in ${utils.Units.bank}`)
+    .addUserOption(option => 
+      option.setName("recipient")
+        .setDescription("Who will you tip? (Don't tip a bot)")
+        .setRequired(true))
+    .addNumberOption(option => 
+      option.setName("amount")
+        .setDescription(`How much ${utils.Units.bank} will you tip?`)
+        .setRequired(true))
   }
 }
