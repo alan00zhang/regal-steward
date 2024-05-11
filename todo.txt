@@ -1,0 +1,16 @@
+balance meme economy
+  - if they can multiply their money through memes then this must be balanced somehow
+  - if they can lose more money than they have, then debt must be handled
+
+climbing up the ladder
+
+more casino games
+  - blackjack
+  - roulette
+  - prisoner's dilemma
+
+systems
+  - scheduler service
+    - scheduler accesses persistent DB and schedules an event at a specific time (event, time)
+    - scheduler polls DB and executes scheduled events
+    - how to define time to execute? datetime? datetime + hour?
