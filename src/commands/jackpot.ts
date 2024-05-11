@@ -15,7 +15,7 @@ export const CommandJackpot: AppCommand = {
 		if (betCost > 100000.00) betCost = 100000.00;
 		if (interaction.options.getSubcommand() === "check") {
 			let response = `The jackpot is currently valued at ${Utils.Units.bankPrefix} ${banker.bankBalanceString}.
-			The cost of a jackpot bet is ${Utils.Units.bankPrefix} ${Utils.formatCurrency(betCost * 100)}.`;
+			The cost of a jackpot bet is ${Utils.Units.bankPrefix} ${Utils.formatCurrency(betCost)}.`;
 			await interaction.reply({
 				content: response,
 				ephemeral: true
@@ -28,7 +28,7 @@ export const CommandJackpot: AppCommand = {
 				});
 				return;
 			}
-			await bankAccount.subtractBank(betCost);
+			await bankAccount.subtractBank(betCost * 100);
 			let roll = Math.floor(Math.random() * 100) + 1;
 			let member = <GuildMember>interaction.member;
 			let response = `<@${member.id}> is taking a chance at the jackpot!\n\nThey rolled a ${roll === 100 ? "⭐100⭐!!!" : roll}\n`;
@@ -38,18 +38,18 @@ export const CommandJackpot: AppCommand = {
 				await bankAccount.addCasinoWinnings(banker.userData.bank_amount);
 				await banker.subtractBank(banker.userData.bank_amount);
 				response += `**Congratulations! <@${member.id}> just won the BIG POT of ${Utils.Units.bankPrefix} ${jackpot}!!!**`
-			} else if (roll > 180) {
-				await bankAccount.addCasinoLosses(betCost);
+			} else if (roll > 90) {
+				await bankAccount.addCasinoLosses(betCost * 100);
 				response += `🇱 Soo close... try again?`
 			} else {
-				await bankAccount.addCasinoLosses(betCost);
+				await bankAccount.addCasinoLosses(betCost * 100);
 				response += `🇱 That's tough... better luck next time.`
 			}
 			await interaction.reply({
 				content: response
 			});
 			await interaction.followUp({
-				content: `You have ${bankAccount.bankBalance} ${Utils.Units.bank} left in your account.`,
+				content: `You have ${Utils.formatCurrency(bankAccount.bankBalance)} ${Utils.Units.bank} left in your account.`,
 				ephemeral: true
 			});
 		}

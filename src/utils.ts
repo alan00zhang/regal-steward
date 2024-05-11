@@ -41,7 +41,7 @@ export class Utils {
   }
 
   static formatCurrency(val: number) {
-    return (val / 100).toLocaleString(undefined, { minimumFractionDigits: 2 });
+    return (val).toLocaleString(undefined, { minimumFractionDigits: 2 });
   }
 
   static Time = {
