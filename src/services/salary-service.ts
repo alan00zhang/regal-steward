@@ -23,7 +23,7 @@ export class SalaryService {
 
   async paySalaries() {
     let currentHour = new Date().getHours();
-    let responseTable = await this.bank.db.get(`SELECT * FROM salary_log WHERE date_paid=date() & hour_paid=${currentHour} LIMIT 1`);
+    let responseTable = await this.bank.db.get(`SELECT * FROM salary_log WHERE date_paid=date() AND hour_paid=${currentHour} LIMIT 1`);
     if (responseTable !== undefined) {
       return;
     };
