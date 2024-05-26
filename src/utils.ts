@@ -1,34 +1,37 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { Routes, Collection, Embed, ActionRowBuilder, SelectMenuBuilder, TextInputBuilder, Client, SlashCommandBuilder, ChatInputCommandInteraction, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandOptionsOnlyBuilder } from 'discord.js';
+import { Routes, Collection, Embed, ActionRowBuilder, TextInputBuilder, Client, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandOptionsOnlyBuilder, AnyComponentBuilder, APISelectMenuOption } from 'discord.js';
 
 export class Utils {
-  static createSelectOptions(options: string[]) {
-    let builders = [];
+  static createSelectOptions(options: string[]): APISelectMenuOption[] {
+    let apiOptions = [];
     for (let option of options) {
-      let builder = new StringSelectMenuOptionBuilder();
-      builder.setLabel(option);
-      builder.setValue(option.toLowerCase());
-      builders.push(builder);
+      let apiOption: APISelectMenuOption
+      apiOption.label = option;
+      apiOption.value = option.toLowerCase();
+      apiOptions.push(apiOption);
     }
-    return builders;
+    return apiOptions;
   }
 
-  static createSelectMenu(customId: string, options: string[], placeholder: string) {
+  static createSelectMenu(customId: string, options: string[] | APISelectMenuOption[], placeholder?: string) {
     let selectMenu = new StringSelectMenuBuilder();
     selectMenu.setCustomId(customId);
-    selectMenu.addOptions(Utils.createSelectOptions(options));
+    if (typeof options[0] === "string") {
+      options = this.createSelectOptions(<string[]>options);
+    }
+    selectMenu.addOptions(<APISelectMenuOption[]>options);
     if (placeholder) selectMenu.setPlaceholder(placeholder);
-    return new ActionRowBuilder().addComponents(selectMenu);
+    return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
   }
   
   static createUpdatedSelectMenu(customId: string, options: string[], selectedValue: string) {
-    // let newOptions = structuredClone(options);
-    // let selectedOption = newOptions.find(option => option.value === selectedValue);
-    // selectedOption.default = true;
+    let newOptions = this.createSelectOptions(options);
+    let selectedOption = newOptions.find(option => option.value === selectedValue);
+    selectedOption.default = true;
   
-    // // reconstruct the select menu, this time updating the selected value
-    // return Utils.createSelectMenu(customId, newOptions);
+    // reconstruct the select menu, this time updating the selected value
+    return Utils.createSelectMenu(customId, newOptions);
   }
 
   static createInputField(customId: string, placeholder: string, min: number, max: number) {
@@ -37,7 +40,7 @@ export class Utils {
     inputField.setPlaceholder(placeholder);
     if (min !== undefined) inputField.setMinLength(min);
     if (max !== undefined) inputField.setMaxLength(max);
-    return new ActionRowBuilder().addComponents(inputField);
+    return new ActionRowBuilder<TextInputBuilder>().addComponents(inputField);
   }
 
   static formatCurrency(val: number) {
