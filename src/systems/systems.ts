@@ -5,10 +5,10 @@ const __dirname = dirname(__filename);
 
 import * as dotenv from "dotenv";
 dotenv.config({path: __dirname + '/.env'});
-import { ButtonInteraction, ChatInputCommandInteraction, Client, GatewayIntentBits, Interaction, InteractionType } from 'discord.js';
+import { ButtonInteraction, ChatInputCommandInteraction, Client, Interaction, InteractionType, MessageComponentInteraction } from 'discord.js';
 import { SalaryService } from '../services/salary-service.js';
 import { MemeService } from '../services/meme-service.js';
-import { Bank, BankAccount } from './bank.js';
+import { Bank } from './bank.js';
 import { CommandCrystalBall } from '../commands/magic-8-ball.js';
 import { CommandCheckBalance } from '../commands/check-balance.js';
 import { KeyValuePair, AppCommand, EventOptions } from '../types.js';
@@ -78,17 +78,15 @@ export class System {
     }
   }
 
-  async guardReply(interaction: ButtonInteraction, matchId?: string) {
-    // guard against anyone other than the caller from using a form
-    let userId = matchId ? matchId : interaction.user.id;
-    if (interaction.customId.endsWith(userId)) {
+  async guardReply(interaction: MessageComponentInteraction, matchId: string) {
+    if (interaction.user.id === matchId) {
       return true;
     } else {
-      await interaction.reply({
+      interaction.reply({
         content: "You are not worthy.",
         ephemeral: true
       })
-      return false;
+      return false;      
     }
   }
 
