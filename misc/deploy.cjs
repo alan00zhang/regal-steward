@@ -53,5 +53,14 @@ module.exports = {
       option.setName("amount")
         .setDescription(`How much ${utils.Units.bank} will you tip?`)
         .setRequired(true))
+  },
+  'crown-and-anchor': {
+    data: new SlashCommandBuilder()
+		.setName('crown-and-anchor')
+		.setDescription('Play a game of Crown and Anchor!')
+    .addNumberOption(option => 
+      option.setName("bet")
+        .setDescription(`How much ${utils.Units.bank} will you wager?`)
+        .setRequired(true))
   }
 }
