@@ -191,6 +191,7 @@ export class BankAccount {
   }
 
   async addBank(val: number) {
+    val = Math.round(val * 100);
     let newBalance = this.userData.bank_amount + val;
     this.bankBalance = newBalance;
     await this.bank.addBankBalance(this.id, val);
@@ -198,6 +199,7 @@ export class BankAccount {
   }
 
   async subtractBank(val: number) {
+    val = Math.round(val * 100);
     let newBalance = this.userData.bank_amount - val;
     this.bankBalance = newBalance;
     await this.bank.addBankBalance(this.id, val * -1);
@@ -205,6 +207,7 @@ export class BankAccount {
   }
 
   async addCasinoWinnings(val: number) {
+    val = Math.round(val * 100);
     let newBalance = this.userData.casino_winnings + val;
     this.casinoWinnings = newBalance;
     await this.bank.addCasinoWinnings(this.id, val);
@@ -212,6 +215,7 @@ export class BankAccount {
   }
 
   async addCasinoLosses(val: number) {
+    val = Math.round(val * 100);
     let newBalance = this.userData.casino_losses + val;
     this.casinoLosses = newBalance;
     await this.bank.addCasinoLosses(this.id, val);

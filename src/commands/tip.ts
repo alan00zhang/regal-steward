@@ -28,8 +28,8 @@ export const CommandTip: AppCommand = {
     let recipientAccount = await system.bank.getUserAccount(
       tippee.id
     )
-    await bankAccount.subtractBank(tip * 100);
-    await recipientAccount.addBank(tip * 100);
+    await bankAccount.subtractBank(tip);
+    await recipientAccount.addBank(tip);
 
 		await interaction.reply({
       content: `<@${member.id}> tipped <@${tippee.id}> ${Utils.Units.bankPrefix} ${Number(tip).toLocaleString(undefined, {minimumFractionDigits: 2})}`
