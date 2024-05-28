@@ -47,7 +47,7 @@ export class Bank {
     try {
       let banker = await this.db.get<UserAccount>("SELECT * FROM users WHERE id = 'bank'");
       if (banker === undefined) {
-        this.db.run("INSERT INTO users(id) VALUES ('bank')")
+        this.db.run("INSERT INTO users(id, bank_amount) VALUES ('bank', 500000)")
       }
       return !!banker;
     } catch (error) {
