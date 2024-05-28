@@ -11,7 +11,7 @@ import { MemeService } from '../services/meme-service.js';
 import { Bank } from './bank.js';
 import { CommandCrystalBall } from '../commands/magic-8-ball.js';
 import { CommandCheckBalance } from '../commands/check-balance.js';
-import { KeyValuePair, AppCommand, EventOptions } from '../types.js';
+import { KeyValuePair, AppCommand, EventOptions, SingletonCommand } from '../types.js';
 import { CommandJackpot } from '../commands/jackpot.js';
 import { CommandCasinoLeaderboards } from '../commands/casino-leaderboards.js';
 import { CommandTip } from '../commands/tip.js';
@@ -61,22 +61,25 @@ export class System {
     return db;
   }
 
-  async createSingletonCommand(interaction: ChatInputCommandInteraction) {
+  createSingletonCommand(interaction: ChatInputCommandInteraction) {
     const commandId = `${interaction.commandName}-${interaction.user.id}`;
     if (this.dbActiveEvents.has(commandId)) {
-      try {
-        await interaction.reply({
-          content: `You can only have one /${interaction.commandName} command open at once.`,
-          ephemeral: true
-        });
-      } catch (error) {
-        console.error(error);
-      } finally {
-        return false;
-      }
+      interaction.reply({
+        content: `You can only have one /${interaction.commandName} command open at once.`,
+        ephemeral: true
+      });
+      return false;
     } else {
       this.dbActiveEvents.store(commandId);
-      return commandId;
+      return new SingletonCommand(this, commandId);
+    }
+  }
+
+  removeSingletonCommand(commandId: string) {
+    try {
+      this.dbActiveEvents.delete(commandId);
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -92,6 +95,7 @@ export class System {
     }
   }
 
+  // likely deprecated
   awaitCustomEventById(eventOptions: EventOptions, commandOptions: any) {
     const interactionFn = async (interaction: Interaction) => {
       if (interaction.type !== InteractionType.MessageComponent && 

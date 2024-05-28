@@ -27,48 +27,15 @@ export class EventOptions {
   duration: number = 30000;
   userId?: string;
 }
-//    * EventOptions is structured like so = {
-//    * 
-//    *  eventName: string,
-//    * 
-//    *  customId: string,
-//    * 
-//    *  eventFn: (interaction) => void,
-//    * 
-//    *  duration: number = 30000,
-//    * 
-//    *  matchUserId?: string
-//    * 
-//    * }
-//    * @param {Object} commandOptions Object for shutting down a unique command instance
-//    * 
-//    * CommandOptions is structured like so = {
-//    * 
-//    *  id: string,
-//    * 
-//    *  removeAfterSuccess: boolean
-//    * 
-//    * }
-//    * 
-//    * @returns {Object} Returns an object with close() function to remove the listener manually
-//    */
 
-//     /**
-//    * Creats the eventOptions config object for the awaitCustomEventById() function
-//    * @param {string} eventName The name of the event
-//    * @param {string} customId The member associated with the event's ID
-//    * @param {(interaction) => void} eventFn The function to execute once the custom event is detected/fired
-//    * @param {number} duration The timeout value of the event listener in milliseconds
-//    * @param {string} matchUserId The user ID of whoever should be the interactor
-//    * 
-//    * @returns {Object} Returns an object with close() function to remove the listener manually
-//    */
-//   createEventOptions: (eventName, customId, eventFn, duration, matchUserId) => {
-//     return {
-//       eventName: eventName,
-//       customId: customId.toString(),
-//       eventFn: eventFn,
-//       duration: duration,
-//       matchUserId: matchUserId?.toString()
-//     }
-//   }
+export class SingletonCommand {
+  system: System;
+  id: string;
+  constructor(system: System, id: string) {
+    this.system = system;
+    this.id = id;
+  }
+  close() {
+    this.system.removeSingletonCommand(this.id);
+  }
+}
