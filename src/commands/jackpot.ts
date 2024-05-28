@@ -30,11 +30,10 @@ export const CommandJackpot: AppCommand = {
 			let roll = Math.floor(Math.random() * 100) + 1;
 			let response = `<@${member.id}> is taking a chance at the jackpot!\n\nThey rolled a ${roll === 100 ? "⭐100⭐!!!" : roll}\n`;
 			if (roll === 100) {
-				let jackpot = banker.bankBalance;
 				await bankAccount.addBank(banker.bankBalance);
 				await bankAccount.addCasinoWinnings(banker.bankBalance);
 				await banker.subtractBank(banker.bankBalance);
-				response += `**Congratulations! <@${member.id}> just won the BIG POT of ${Utils.Units.bankPrefix} ${jackpot}!!!**`
+				response += `**Congratulations! <@${member.id}> just won the BIG POT of ${Utils.Units.bankPrefix} ${banker.bankBalanceString}!!!**`
 			} else if (roll > 90) {
 				await bankAccount.addCasinoLosses(betCost);
 				response += `🇱 Soo close... try again?`
