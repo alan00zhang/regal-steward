@@ -6,9 +6,10 @@ export class Utils {
   static createSelectOptions(options: string[]): APISelectMenuOption[] {
     let apiOptions = [];
     for (let option of options) {
-      let apiOption: APISelectMenuOption
-      apiOption.label = option;
-      apiOption.value = option.toLowerCase();
+      let apiOption: APISelectMenuOption = {
+        label: option,
+        value: option.toLowerCase()
+      }
       apiOptions.push(apiOption);
     }
     return apiOptions;
@@ -25,11 +26,13 @@ export class Utils {
     return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
   }
   
-  static createUpdatedSelectMenu(customId: string, options: string[], selectedValue: string) {
-    let newOptions = this.createSelectOptions(options);
+  static createUpdatedSelectMenu(customId: string, options: string[] | APISelectMenuOption[], selectedValue: string) {
+    if (typeof options[0] === "string") {
+      options = this.createSelectOptions(<string[]>options);
+    }
+    let newOptions = structuredClone(<APISelectMenuOption[]>options);
     let selectedOption = newOptions.find(option => option.value === selectedValue);
     selectedOption.default = true;
-  
     // reconstruct the select menu, this time updating the selected value
     return Utils.createSelectMenu(customId, newOptions);
   }
