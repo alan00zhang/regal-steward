@@ -30,7 +30,7 @@ client.once('ready', async () => {
 	console.log('Ready!');
 	await system.bank.open();
 	await system.bank.loadNewUsers();
-	system.Salary.service();
+	// system.Salary.service();
 	// system.Meme.service();
 });
 
