@@ -14,7 +14,7 @@ function main() {
 		// const filePath = path.join(commandsPath, file);
 		const name = file.slice(0, -3);
 		const command = Commands[name]
-		commands.push(command.data);
+		if (command) commands.push(command.data);
 	}
 	
 	const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);

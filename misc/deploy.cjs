@@ -16,7 +16,7 @@ module.exports = {
     .addStringOption(option => 
       option.setName("question")
         .setDescription("What do you seek?")
-        .setRequired(false))
+        .setRequired(true))
   },
   'check-balance': {
     data: new SlashCommandBuilder()
