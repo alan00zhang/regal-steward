@@ -1,13 +1,19 @@
-import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ChatInputCommandInteraction, GuildMember } from 'discord.js';
-const systemsJs = require('../systems/systems.js').default;
+import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ChatInputCommandInteraction, GuildMember, Interaction, APISelectMenuOption } from 'discord.js';
 import { Utils } from '../utils.js';
 import { System } from '../systems/systems.js';
 import { AppCommand } from '../types.js';
 
 const commandName = "crown-and-anchor";
-const outcomes = ["Crowns", "Anchors", "Spades", "Hearts", "Clubs", "Diamonds"];
+const outcomes: APISelectMenuOption[] = [
+  { label: "Crowns", value: "crown" },
+  { label: "Anchors", value: "anchor" },
+  { label: "Spades", value: "spades" },
+  { label: "Hearts", value: "hearts" },
+  { label: "Clubs", value: "clubs" },
+  { label: "Dimaonds", value: "diamonds" },
+]
 const roll = () => {
-  return outcomes[Math.floor(Math.random() * outcomes.length)].toLowerCase();
+  return outcomes[Math.floor(Math.random() * outcomes.length)].value;
 }
 
 // Process the suit selection and render a Start Game button
@@ -18,12 +24,12 @@ const roll = () => {
 //     listenSuccess.status = true;
 // 		collector.stop();
 
-//     let [r1, r2, r3] = [roll(), roll(), roll()];
-//     let response = `<@${i.member.id}> is playing a game of Crown and Anchor\n\nThey picked ${bet.selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
+    // let [r1, r2, r3] = [roll(), roll(), roll()];
+    // let response = `<@${i.member.id}> is playing a game of Crown and Anchor\n\nThey picked ${bet.selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
 
-//     await i.reply({
-//       content: response,
-//     });
+    // await i.reply({
+    //   content: response,
+    // });
     
 //     let wins = [r1, r2, r3].filter(x => x === bet.selectedSuit).length;
 //     let banker = await interaction.client.system.bank.getUserAccount("bank");
@@ -99,14 +105,13 @@ export const CommandCrownAndAnchor: AppCommand = {
     const commandId = await system.createSingletonCommand(interaction);
 		if (!commandId) return;
 
-    let listenSuccess = {};
     let suitSelectId = `caa-suit-select-${member.id}`
     const suitSelectMenu = Utils.createSelectMenu(
       suitSelectId, 
       outcomes,
       "Pick a suit"
     );
-    const suitSelect = await interaction.reply({
+    const suitPicker = await interaction.reply({
       content: `Which suit do you place your bet on?`,
       components: [suitSelectMenu],
       ephemeral: true
@@ -114,45 +119,44 @@ export const CommandCrownAndAnchor: AppCommand = {
 
     // create an InteractionCollector that watches and updates the dropdown menu whenever an option is selected,
 		// also updates the message with the Start Game button
-		const collector = suitSelect.createMessageComponentCollector(
+    let selectedSuit: string;
+		const collector = suitPicker.createMessageComponentCollector(
       { componentType: ComponentType.StringSelect, time: Utils.Time.MINUTE5 }
     );
-		let listener;
 		collector.on('collect', async i => {
-				if (await system.guardReply(i, commandName)) {
-          const startGameRow = new ActionRowBuilder<ButtonBuilder>()
-          .addComponents(
-            new ButtonBuilder()
-              .setCustomId(`caa-start-${member.id}`)
-              .setLabel("Roll the Dice")
-              .setStyle(ButtonStyle.Success)
-              .setEmoji("🎲")
-          );
-          
-					// display the clicked option as the selected value
-					let selectedSuit = i.values[0];
-					const updatedSuitSelectRow = Utils.createUpdatedSelectMenu(suitSelectId, outcomes, selectedSuit);
-          await i.update({
-            content: `What suit do you bet on?`,
-            components: [updatedSuitSelectRow, startGameRow]
-          });
-
-          
-
-          let betInfo = {
-            userAccount: bankAccount,
-            amount: bet,
-            selectedSuit: selectedSuit
-          }
-				
-          // if (listener) {
-          //   listener.close();
-          // }
-          // wait for better to begin game
-          // listener = runGame(interaction, collector, listenSuccess, betInfo);
-        }
-			
+      const startGameRow = new ActionRowBuilder<ButtonBuilder>()
+      .addComponents(
+        new ButtonBuilder()
+          .setCustomId(`caa-start`)
+          .setLabel("Roll the Dice")
+          .setStyle(ButtonStyle.Success)
+          .setEmoji("🎲")
+      );
+      
+      // display the clicked option as the selected value
+      selectedSuit = i.values[0];
+      const updatedSuitSelectRow = Utils.createUpdatedSelectMenu(suitSelectId, outcomes, selectedSuit);
+      await i.update({
+        content: `What suit do you bet on?`,
+        components: [updatedSuitSelectRow, startGameRow]
+      });
 		});
+
+    // GAME STARTED
+    try {
+      let gameStart = await suitPicker.awaitMessageComponent({filter: async i => i.customId === "caa-start", time: Utils.Time.MINUTE5});
+  
+      let [r1, r2, r3] = [roll(), roll(), roll()];
+      let response = `<@${member.id}> is playing a game of Crown and Anchor\n\nThey picked ${selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
+  
+      await gameStart.reply({
+        content: response,
+        ephemeral: true
+      });
+    } catch {
+      interaction.editReply({ content: 'You did not select a suit in time, exiting game...', components: [] })
+    }
+    
 
     // collector.once('end', collected => {
 		// 	if (!listenSuccess.status) interaction.client.system.dbActiveEvents.removeById(commandId);

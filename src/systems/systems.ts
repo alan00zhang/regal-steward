@@ -15,6 +15,7 @@ import { KeyValuePair, AppCommand, EventOptions } from '../types.js';
 import { CommandJackpot } from '../commands/jackpot.js';
 import { CommandCasinoLeaderboards } from '../commands/casino-leaderboards.js';
 import { CommandTip } from '../commands/tip.js';
+import { CommandCrownAndAnchor } from '../commands/crown-and-anchor.js';
 
 export type UniqueItem<T>= {
   id: string,
@@ -33,7 +34,8 @@ export class System {
     'check-balance': CommandCheckBalance,
     'jackpot': CommandJackpot,
     'casino-leaderboards': CommandCasinoLeaderboards,
-    'tip': CommandTip
+    'tip': CommandTip,
+    'crown-and-anchor': CommandCrownAndAnchor
   }
 
   constructor(client: Client) {
