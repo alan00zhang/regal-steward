@@ -2,7 +2,6 @@ import { ChatInputCommandInteraction } from "discord.js";
 import { AppCommand } from "../types.js";
 import { SlashCommandBuilder } from 'discord.js';
 
-type QuestionType = 'What' | 'Where' | 'Will' | 'How' | 'When' | 'Why' | 'Should' | 'Do' | 'Is' | 'How much' | 'Who' | 'Which' | 'Are' | 'What if';
 const whatResponses = [
 	"I'm not quite sure.",
 	"It's hard to say.",
