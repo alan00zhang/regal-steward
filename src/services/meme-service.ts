@@ -1,10 +1,17 @@
-const utils = require('../utils.js');
+import { Client, TextChannel } from "discord.js";
+import { Utils } from "../utils.js";
+import { System } from "../systems/systems.js";
+import { Bank } from "../systems/bank.js";
 
-class MemeService {
-  constructor(client) {
-    this.client = client;
-    this.system = client.system;
-    this.bank = client.system.bank;
+export class MemeService {
+  client: Client;
+  system: System;
+  bank: Bank;
+  
+  constructor(system: System) {
+    this.client = system.client;
+    this.system = system;
+    this.bank = system.bank;
   }
 
   service() {
@@ -13,7 +20,7 @@ class MemeService {
 
   async receiveMeme() {
     this.client.on("messageCreate", async (msg) => {
-      if (msg.channel.name === "memes" 
+      if ((<TextChannel>msg.channel).name === "memes" 
       && !msg.member.user.bot 
       && (msg.embeds.length || msg.attachments.size || msg.content.includes("https://") || msg.content.includes("http://"))) {
         const memberId = msg.member.id;
@@ -27,8 +34,8 @@ class MemeService {
         await msg.react(katy);
         await msg.react(catJAM);
         
-        const reactions = [];
-        const filter = (reaction, user) => {
+        const reactions: any[] = [];
+        const filter = (reaction: any, user: any) => {
           let isMemeReaction = [catJAM, katy, eggboy, sham].indexOf(reaction.emoji) !== -1;
           let isNotOP = user.id !== msg.author.id;
           if (isMemeReaction && isNotOP) {
@@ -44,7 +51,7 @@ class MemeService {
           }
         }
 
-        await msg.awaitReactions({filter, time: utils.Time.HOUR8});
+        await msg.awaitReactions({filter, time: Utils.Time.HOUR8});
         let pay = 0;
         let badMemeCount = 0;
 
@@ -67,15 +74,15 @@ class MemeService {
         }
         if (pay > 0) {
           msg.channel.send({
-            content: `<@${memberId}>, thank you for your contribution to the economy.\nYou have earned ${utils.Units.bankPrefix} ${(pay / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your GOOD meme.`
+            content: `<@${memberId}>, thank you for your contribution to the economy.\nYou have earned ${Utils.Units.bankPrefix} ${(pay / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your GOOD meme.`
           });
         } else if (pay < 0) {
           msg.channel.send({
-            content: `<@${memberId}>, thank you for your contribution to the economy.\nYou have been fined ${utils.Units.bankPrefix} ${(pay / -100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your BAD meme.`
+            content: `<@${memberId}>, thank you for your contribution to the economy.\nYou have been fined ${Utils.Units.bankPrefix} ${(pay / -100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your BAD meme.`
           });
         } else if (reactions.length === 0) {
           msg.channel.send({
-            content: `<@${memberId}>, thank you for your contribution to the economy. Unfortunately no one was engaged with your meme.\nYou have been paid ${utils.Units.bankPrefix} 50.00 out of pity.`
+            content: `<@${memberId}>, thank you for your contribution to the economy. Unfortunately no one was engaged with your meme.\nYou have been paid ${Utils.Units.bankPrefix} 50.00 out of pity.`
           });
           await userAccount.addMemeEarnings(5000);
         } else if (pay === 0) {
@@ -87,8 +94,4 @@ class MemeService {
       }
     });
   }
-}
-
-module.exports = {
-  MemeService: MemeService
 }

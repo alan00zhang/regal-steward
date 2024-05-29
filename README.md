@@ -1,1 +1,2 @@
-This discord bot serves as a faithful steward to those residing in the same server.
+# Discord bot under major overhaul.
+User Management Suite with quick and easy setup

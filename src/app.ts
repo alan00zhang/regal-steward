@@ -1,8 +1,15 @@
-require('dotenv').config({path: __dirname});
-const systemsJs = require('./systems.js');
-const sqlite3 = require('sqlite3').verbose();
-const { Client, GatewayIntentBits } = require('discord.js');
-const { getCommands } = require('./utils')
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+import * as dotenv from "dotenv";
+dotenv.config({path: __dirname + '/.env'});
+import { System } from './systems/systems.js';
+import { Client, GatewayIntentBits, GuildMember } from 'discord.js';
+import { Utils } from './utils.js';
+import { AppCommand } from './types.js';
+
 const intents = [
 	GatewayIntentBits.Guilds,
 	GatewayIntentBits.GuildMessages,
@@ -13,10 +20,10 @@ const intents = [
 ]
 
 // Create a new client instance
-const client = new Client({ intents: intents });
+const client: Client = new Client({ intents: intents });
 // Use the system singleton in systemsJs so other files can use the same system without forming circular dependencies
-const system = systemsJs.system.attachClient(client);
-getCommands(client);
+const system = new System(client);
+system.initServices();
 
 // When the client is ready, run this code (only once)
 client.once('ready', async () => {
@@ -24,17 +31,15 @@ client.once('ready', async () => {
 	await system.bank.open();
 	await system.bank.loadNewUsers();
 	system.Salary.service();
-	system.Meme.service();
+	// system.Meme.service();
 });
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isChatInputCommand()) return;
-	const command = interaction.client.commands.get(interaction.commandName);
+	const command: AppCommand = system.getCommand(interaction.commandName);
 	if (!command) return;
-	
 	try {
-		let userAccount = await system.bank.getUserAccount(interaction.member.id)
-		await command.execute(interaction, userAccount);
+		await command.execute(interaction, system);
 	} catch (error) {
 		// Disconnect from the database
 		await system.bank.close();
