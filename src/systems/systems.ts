@@ -40,7 +40,7 @@ export class System {
   }
 
   constructor(client: Client) {
-    this.dbActiveEvents = <UniqueSystemDatabase<string>>this.createDB<any>("activeEvents", "unique"); // type activeEvents?
+    this.dbActiveEvents = <UniqueSystemDatabase<string>>this.createDB<string>("activeEvents", "unique"); // type activeEvents?
     this.bank = new Bank(this);
     this.client = client;
   }
