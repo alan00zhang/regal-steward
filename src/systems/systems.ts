@@ -17,6 +17,7 @@ import { CommandCasinoLeaderboards } from '../commands/casino-leaderboards.js';
 import { CommandTip } from '../commands/tip.js';
 import { CommandCrownAndAnchor } from '../commands/crown-and-anchor.js';
 import { UniqueSystemDatabase, BasicSystemDatabase } from './database.js';
+import { CommandBlackjack } from '../commands/blackjack.js';
 
 export type UniqueItem<T>= {
   id: string,
@@ -36,7 +37,8 @@ export class System {
     'jackpot': CommandJackpot,
     'casino-leaderboards': CommandCasinoLeaderboards,
     'tip': CommandTip,
-    'crown-and-anchor': CommandCrownAndAnchor
+    'crown-and-anchor': CommandCrownAndAnchor,
+    'blackjack': CommandBlackjack
   }
 
   constructor(client: Client) {
