@@ -97,49 +97,4 @@ export class System {
       return false;      
     }
   }
-
-  // likely deprecated
-  awaitCustomEventById(eventOptions: EventOptions, commandOptions: any) {
-    const interactionFn = async (interaction: Interaction) => {
-      if (interaction.type !== InteractionType.MessageComponent && 
-        interaction.type !== InteractionType.ModalSubmit) return;
-
-      // example syntax = approval-request-submit-288455203840196608
-      if (interaction.customId !== `${eventOptions.name}-${eventOptions.id}`) return;
-
-      if (eventOptions.userId && interaction.user.id !== eventOptions.userId) {
-        if (!interaction.deferred && !interaction.replied) {
-          await interaction.reply({
-            content: "You are not worthy.",
-            ephemeral: true
-          });
-        }
-        return;
-      };
-      
-      try {
-        eventOptions.eventFn(interaction); // TODO: add optional args and change {eventFn, args} into an object param
-      } catch (error) {
-        throw new Error(`Custom interaction event failed to fire.
-        EventFn: ${eventOptions.eventFn}`);
-      } finally {
-        // TODO: implement whatever this was
-        // if (commandOptions?.removeAfterSuccess) {
-        //   system.dbActiveEvents.removeById(commandOptions.id);
-        // }
-        this.client.removeListener("interactionCreate", interactionFn);
-      }
-    }
-    this.client.on("interactionCreate", interactionFn);
-    const customEvent = {
-      close: () => this.client.removeListener("interactionCreate", interactionFn)
-    }
-    setTimeout(() => {
-      // if (commandOptions) {
-      //   this.dbActiveEvents.delete(commandOptions.id);
-      // }
-      this.client.removeListener("interactionCreate", interactionFn);
-    }, eventOptions.duration);
-    return interactionFn;
-  }
 }

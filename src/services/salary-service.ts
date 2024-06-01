@@ -1,20 +1,8 @@
-import { Client } from 'discord.js';
-import { System } from '../systems/systems.js';
-import { Bank } from '../systems/bank.js';
 import { Utils } from '../utils.js';
+import { SystemService } from './service.js';
 
-export class SalaryService {
-  client: Client;
-  system: System;
-  bank: Bank;
-  
-  constructor(system: System) {
-    this.client = system.client;
-    this.system = system;
-    this.bank = system.bank;
-  }
-
-  service() {
+export class SalaryService extends SystemService {
+  service(): void {
     this.paySalaries();
     setInterval(() => {
       this.paySalaries();
