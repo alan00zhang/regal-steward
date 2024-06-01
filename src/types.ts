@@ -60,6 +60,9 @@ export class Card {
     this.suit = suit;
     this.number = number;
   }
+  toString() {
+    return `${CardNumber[this.number]} of ${Suit[this.suit]}`
+  }
 }
 
 export class Deck {
@@ -97,6 +100,14 @@ export class Hand {
     this.cards.push(deck.draw());
   }
   discard(card?: Card) {
-    
+    let index = card ? this.cards.indexOf(card) : 0
+    this.cards.splice(index);
+  }
+  toString() {
+    let str = ""
+    for (let card of this.cards) {
+      str += `|  ${card}  |`
+    }
+    return str;
   }
 }
