@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, GuildMember } from "discord.js";
-import { AppCommand, Card, Deck, NumericRange } from "../types.js";
+import { AppCommand, Deck, Hand } from "../types.js";
 import { System } from "../systems/systems.js";
+import { Utils } from "../utils.js";
 
 export const CommandBlackjack: AppCommand = {
   async execute(interaction: ChatInputCommandInteraction, system: System) {
@@ -18,16 +19,22 @@ export const CommandBlackjack: AppCommand = {
 		if (command === false) return;
     
     await interaction.reply({
-      content: `<@${member.id}> is playing a hand of blackjack...`
+      content: `<@${member.id}> is playing a hand of blackjack...`,
+      ephemeral: true
     });
 
     const deck = new Deck();
     deck.shuffle();
+    const yourHand = new Hand();
+    const dealerHand = new Hand();
 
-    let game = await interaction.followUp({
-      content: ``,
-      ephemeral: true
-    })
+
+
+    for (let i = 0; i < 2; ++i) {
+      yourHand.draw(deck);
+      dealerHand.draw(deck);
+      // await game.edit(`Your hand: ${yourHand}` + `\n Dealer's hand: ${dealerHand}`)
+    }
   }
 }
 

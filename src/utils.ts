@@ -50,6 +50,14 @@ export class Utils {
     return (val).toLocaleString(undefined, { minimumFractionDigits: 2 });
   }
 
+  static delay(time: number) {
+    return new Promise<void>(resolve => {
+      setTimeout(() => {
+        resolve()
+      }, time);
+    })
+  }
+
   static Time = {
     MINUTE5: 1000 * 60 * 5,
     MINUTE15: 1000 * 60 * 15,
