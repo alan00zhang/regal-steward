@@ -45,16 +45,12 @@ export class System {
     this.dbActiveEvents = <UniqueSystemDatabase<string>>this.createDB<string>("activeEvents", "unique"); // type activeEvents?
     this.bank = new Bank(this);
     this.client = client;
+    this.Salary = new SalaryService(this);
+    this.Meme = new MemeService(this);
   }
 
   getCommand(commandName: string) {
     return this.commandMapping[commandName];
-  }
-  
-  initServices() {
-    this.Salary = new SalaryService(this);
-    this.Meme = new MemeService(this);
-    return;
   }
 
   createDB<T>(name: string, type: string) {
