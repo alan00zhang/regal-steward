@@ -106,7 +106,7 @@ export class Hand {
   toString() {
     let str = ""
     for (let card of this.cards) {
-      str += `|  ${card}  |`
+      str += `|  ${card}  | `
     }
     return str;
   }

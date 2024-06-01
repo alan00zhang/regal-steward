@@ -18,9 +18,12 @@ export const CommandBlackjack: AppCommand = {
     const command = system.createSingletonCommand(interaction);
 		if (command === false) return;
     
-    await interaction.reply({
-      content: `<@${member.id}> is playing a hand of blackjack...`,
+    let game = await interaction.reply({
+      content: `Dealing you in...`,
       ephemeral: true
+    });
+    interaction.channel.send({
+      content: `<@${member.id}> is playing a hand of blackjack...`
     });
 
     const deck = new Deck();
@@ -28,13 +31,11 @@ export const CommandBlackjack: AppCommand = {
     const yourHand = new Hand();
     const dealerHand = new Hand();
 
-
-
     for (let i = 0; i < 2; ++i) {
+      await Utils.delay(1000);
       yourHand.draw(deck);
       dealerHand.draw(deck);
-      // await game.edit(`Your hand: ${yourHand}` + `\n Dealer's hand: ${dealerHand}`)
+      await game.edit(`${"Your hand:".padEnd(20)} ${yourHand}` + `\n${"Dealer's hand:".padEnd(20)} ${dealerHand}`);
     }
   }
 }
-
