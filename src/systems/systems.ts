@@ -18,6 +18,7 @@ import { CommandTip } from '../commands/tip.js';
 import { CommandCrownAndAnchor } from '../commands/crown-and-anchor.js';
 import { UniqueSystemDatabase, BasicSystemDatabase } from './database.js';
 import { CommandBlackjack } from '../commands/blackjack.js';
+import { CasinoService } from '../services/casino-service.js';
 
 export type UniqueItem<T>= {
   id: string,
@@ -29,6 +30,7 @@ export class System {
   dbActiveEvents: UniqueSystemDatabase<string>;
   Salary: SalaryService;
   Meme: MemeService;
+  Casino: CasinoService;
   
   // Add your command to this list in order to activate your command
   private commandMapping: KeyValuePair<AppCommand> = {
@@ -42,22 +44,16 @@ export class System {
   }
 
   constructor(client: Client) {
-    this.dbActiveEvents = <UniqueSystemDatabase<string>>this.createDB<string>("activeEvents", "unique"); // type activeEvents?
+    this.dbActiveEvents = new UniqueSystemDatabase<string>("activeEvents");
     this.bank = new Bank(this);
     this.client = client;
     this.Salary = new SalaryService(this);
     this.Meme = new MemeService(this);
+    this.Casino = new CasinoService(this);
   }
 
   getCommand(commandName: string) {
     return this.commandMapping[commandName];
-  }
-
-  createDB<T>(name: string, type: string) {
-    let db;
-    if (!type) db = new BasicSystemDatabase<T>(name);
-    else if (type === "unique") db = new UniqueSystemDatabase<T>(name);
-    return db;
   }
 
   createSingletonCommand(interaction: ChatInputCommandInteraction) {

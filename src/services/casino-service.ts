@@ -1,9 +1,26 @@
+import { UniqueSystemDatabase } from "../systems/database.js";
 import { Suit, CardNumber } from "../types.js";
+import { Utils } from "../utils.js";
 import { SystemService } from "./service.js";
 
 export class CasinoService extends SystemService {
+  dealers: UniqueSystemDatabase<string>;
+  cardWidth = 150;
+  cardHeight = 150;
   service(): void {
-      
+    this.dealers = new UniqueSystemDatabase<string>("dealers");
+  }
+
+  requestDealer(game: string) {
+
+  }
+
+  displayCards(cards: Card[]) {
+    let paths = [];
+    for (let card of cards) {
+      paths.push(`cards/${CardNumber[card.number]}_of_${Suit[card.suit]}.png`);
+    }
+    return Utils.getImage(paths, 100, 150);
   }
 }
 
@@ -51,7 +68,9 @@ export class Deck {
 export class Hand {
   cards: Card[] = [];
   draw(deck: Deck) {
-    this.cards.push(deck.draw());
+    let card = deck.draw();
+    this.cards.push(card);
+    return card;
   }
   discard(card?: Card) {
     let index = card ? this.cards.indexOf(card) : 0
@@ -64,4 +83,8 @@ export class Hand {
     }
     return str;
   }
+}
+
+export class Dealer extends Hand {
+  
 }

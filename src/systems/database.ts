@@ -59,6 +59,7 @@ export class UniqueSystemDatabase<T> extends BasicSystemDatabase<T> {
       super.store(item);
     } else {
       if (overwrite) existingItem = item;
+      throw new Error(`Tried to store ${item}, but item already exists in DB ${this.name}. Try specifying overwrite flag.`)
     }
   }
 }

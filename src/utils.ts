@@ -57,16 +57,34 @@ export class Utils {
     })
   }
 
-  static async getImage(path: string, width: number, height: number) {
-    const canvas = Canvas.createCanvas(width, height);
-    const context = canvas.getContext("2d");
-    let imagePath = "./assets/"
-    try {
-      const background = await Canvas.loadImage(imagePath + path);
-      context.drawImage(background, 0, 0, canvas.width, canvas.height);
+  static async getImage(path: string[], width: number, height: number): Promise<AttachmentBuilder>
+  static async getImage(path: string, width: number, height: number): Promise<AttachmentBuilder>
+  static async getImage(path: string | string[], width: number, height: number) {
+    if (typeof path === "string") {
+      const canvas = Canvas.createCanvas(width, height);
+      const context = canvas.getContext("2d");
+      let imagePath = "src/assets/"
+      try {
+        const background = await Canvas.loadImage(imagePath + path);
+        context.drawImage(background, 0, 0, canvas.width, canvas.height);
+        return new AttachmentBuilder(await canvas.encode('png'));
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      const canvas = Canvas.createCanvas(width * path.length, height);
+      const context = canvas.getContext("2d");
+      let imagePath = "src/assets/"
+      for (let i = 0; i < path.length; ++i) {
+        let xPos = 0 + i * width;
+        try {
+          const background = await Canvas.loadImage(imagePath + path[i]);
+          context.drawImage(background, xPos, 0, width, height);
+        } catch (error) {
+          console.error(error);
+        }
+      }
       return new AttachmentBuilder(await canvas.encode('png'));
-    } catch (error) {
-      console.error(error);
     }
   }
 
