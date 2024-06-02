@@ -3,11 +3,18 @@
   "version": "0.1.0",
   "description": "Emporium Steward for Discord",
   "main": "app.js",
+  "watch": {
+    "build": {
+      "patterns": ["src"],
+      "extensions": "ts"
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy-commands": "node deploy-commands.js",
     "build": "tsc && npm run copy:assets",
-    "copy:assets": "cpx src/assets/** dist/assets"
+    "copy:assets": "cp -R src/assets dist/assets",
+    "watch": "npm-watch"
   },
   "keywords": [
     "discord",
@@ -30,5 +37,8 @@
     "node-fetch": "^3.2.3",
     "sqlite": "^4.1.2",
     "sqlite3": "^5.1.1"
+  },
+  "devDependencies": {
+    "npm-watch": "^0.13.0"
   }
 }
