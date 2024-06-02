@@ -1,6 +1,5 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { Routes, Collection, Embed, ActionRowBuilder, TextInputBuilder, Client, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandOptionsOnlyBuilder, AnyComponentBuilder, APISelectMenuOption } from 'discord.js';
+import { ActionRowBuilder, TextInputBuilder, StringSelectMenuBuilder, APISelectMenuOption, AttachmentBuilder } from 'discord.js';
+import * as Canvas from '@napi-rs/canvas'
 
 export class Utils {
   static createSelectOptions(options: string[]): APISelectMenuOption[] {
@@ -56,6 +55,15 @@ export class Utils {
         resolve()
       }, time);
     })
+  }
+
+  static async getImage(path: string, width: number, height: number) {
+    const canvas = Canvas.createCanvas(width, height);
+    const context = canvas.getContext("2d");
+    let imagePath = "./assets/"
+    const background = await Canvas.loadImage(imagePath + path);
+    context.drawImage(background, 0, 0, canvas.width, canvas.height);
+    return new AttachmentBuilder(await canvas.encode('png'));
   }
 
   static Time = {
