@@ -1,7 +1,8 @@
 import { ChatInputCommandInteraction, GuildMember } from "discord.js";
-import { AppCommand, Deck, Hand } from "../types.js";
+import { AppCommand } from "../types.js";
 import { System } from "../systems/systems.js";
 import { Utils } from "../utils.js";
+import { Deck, Hand } from "../services/casino-service.js";
 
 export const CommandBlackjack: AppCommand = {
   async execute(interaction: ChatInputCommandInteraction, system: System) {
