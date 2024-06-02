@@ -61,9 +61,13 @@ export class Utils {
     const canvas = Canvas.createCanvas(width, height);
     const context = canvas.getContext("2d");
     let imagePath = "./assets/"
-    const background = await Canvas.loadImage(imagePath + path);
-    context.drawImage(background, 0, 0, canvas.width, canvas.height);
-    return new AttachmentBuilder(await canvas.encode('png'));
+    try {
+      const background = await Canvas.loadImage(imagePath + path);
+      context.drawImage(background, 0, 0, canvas.width, canvas.height);
+      return new AttachmentBuilder(await canvas.encode('png'));
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   static Time = {
