@@ -1,3 +1,5 @@
+import { PrimaryKeyObject } from "../types.js";
+
 // Database class with basic CRUD operations
 export abstract class AbstractSystemDatabase<T> {
   public name: string;
@@ -60,6 +62,42 @@ export class UniqueSystemDatabase<T> extends BasicSystemDatabase<T> {
     } else {
       if (overwrite) existingItem = item;
       throw new Error(`Tried to store ${item}, but item already exists in DB ${this.name}. Try specifying overwrite flag.`)
+    }
+  }
+}
+
+export class UniqueKeySystemDatabase<Key extends string> extends BasicSystemDatabase<PrimaryKeyObject<Key>> {
+  primaryKey: Key;
+  
+  constructor(name: string, key: Key) {
+    super(name);
+    this.primaryKey = key;
+  }
+
+  getByID(pKeyValue: any) {
+    return this._db.find(item => item[this.primaryKey] === pKeyValue);
+  }
+  
+  has(pKeyValue: any) {
+    return this.getByID(pKeyValue) !== undefined;
+  }
+
+  store(item: PrimaryKeyObject<Key>, overwrite?: boolean) {
+    let existingItem = this.getByID(item[this.primaryKey]);
+    if (!existingItem) {
+      super.store(item);
+    } else {
+      if (overwrite) existingItem = item;
+      throw new Error(`Tried to store ${item}, but item already exists in DB ${this.name}. Try specifying overwrite flag.`)
+    }
+  }
+
+  deleteByID(pKeyValue: any) {
+    let index = this._db.indexOf(this.getByID(pKeyValue));
+    if (index !== 1) {
+      this.deleteByIndex(index);
+    } else {
+      console.warn(`Could not delete item with value ${pKeyValue} in ${this.name} database!`)
     }
   }
 }

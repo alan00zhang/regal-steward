@@ -20,6 +20,8 @@ export type KeyValuePair<Key extends string | number | symbol, T> = {
   [key in Key]: T;
 }
 
+export type PrimaryKeyObject<Key extends string> = KeyValuePair<Key, any> & { [k: string]: any }
+
 export class EventOptions {
   name: string;
   id: string;
@@ -51,5 +53,3 @@ export type NumericRange<
 
 export enum Suit { Diamonds, Clubs, Hearts, Spades }
 export enum CardNumber { Ace = 1, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King }
-
-export type PrimaryKeyObject = {}
