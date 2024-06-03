@@ -16,8 +16,8 @@ export type AppCommand = {
   execute: (interaction: ChatInputCommandInteraction, system: System) => any
 }
 
-export type KeyValuePair<T> = {
-  [key: string]: T;
+export type KeyValuePair<Key extends string | number | symbol, T> = {
+  [key in Key]: T;
 }
 
 export class EventOptions {
@@ -49,6 +49,7 @@ export type NumericRange<
   ? acc | start | end
   : NumericRange<start, end, [...arr, 1], arr[start] extends undefined ? acc : acc | arr['length']>;
 
-// Casino types
 export enum Suit { Diamonds, Clubs, Hearts, Spades }
 export enum CardNumber { Ace = 1, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King }
+
+export type PrimaryKeyObject = {}

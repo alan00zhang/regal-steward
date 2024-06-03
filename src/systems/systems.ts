@@ -33,7 +33,7 @@ export class System {
   Casino: CasinoService;
   
   // Add your command to this list in order to activate your command
-  private commandMapping: KeyValuePair<AppCommand> = {
+  private commandMapping: KeyValuePair<string, AppCommand> = {
     'magic-8-ball': CommandCrystalBall,
     'check-balance': CommandCheckBalance,
     'jackpot': CommandJackpot,
