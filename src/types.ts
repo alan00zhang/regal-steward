@@ -53,3 +53,5 @@ export type NumericRange<
 
 export enum Suit { Diamonds, Clubs, Hearts, Spades }
 export enum CardNumber { Ace = 1, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King }
+
+export type CasinoGame = "blackjack" | "roulette" | "poker"

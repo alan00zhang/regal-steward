@@ -1,18 +1,38 @@
-import { UniqueSystemDatabase } from "../systems/database.js";
-import { Suit, CardNumber } from "../types.js";
+import { UniqueKeySystemDatabase, UniqueSystemDatabase } from "../systems/database.js";
+import { Suit, CardNumber, CasinoGame } from "../types.js";
 import { Utils } from "../utils.js";
 import { SystemService } from "./service.js";
 
 export class CasinoService extends SystemService {
-  dealers: UniqueSystemDatabase<string>;
+  dealers: UniqueKeySystemDatabase<"game">
   cardWidth = 150;
   cardHeight = 150;
   service(): void {
-    this.dealers = new UniqueSystemDatabase<string>("dealers");
+    this.dealers = new UniqueKeySystemDatabase("dealers", "game");
   }
 
-  requestDealer(game: string) {
-
+  requestDealer(game: CasinoGame) {
+    if (!this.dealers.has(game)) {
+      let dealer: Dealer;
+      switch (game) {
+        case "blackjack":
+          dealer = new Dealer("blackjack", new Deck(4));
+          this.dealers.store(dealer);
+          break;
+          case "roulette":
+          dealer = new Dealer("roulette");
+          this.dealers.store(dealer);
+          break;
+          case "poker":
+          dealer = new Dealer("poker", new Deck(4));
+          this.dealers.store(dealer);
+          break;
+      }
+      return dealer;
+    } else {
+      return false;
+      // return this.dealers.getByID(game) as Dealer;
+    }
   }
 
   displayCards(cards: Card[]) {
@@ -27,10 +47,13 @@ export class CasinoService extends SystemService {
 export class Card {
   suit: Suit;
   number: CardNumber;
+  hidden: boolean = false;
   constructor(suit: Suit, number: CardNumber) {
     this.suit = suit;
     this.number = number;
   }
+  show() { this.hidden = false }
+  hide() { this.hidden = true }
   toString() {
     return `${CardNumber[this.number]} of ${Suit[this.suit]}`
   }
@@ -39,13 +62,16 @@ export class Card {
 export class Deck {
   private _startingCards: Card[] = [];
   remainingCards: Card[] = [];
-  constructor() {
-    for (let suit of Object.values(Suit)) {
-      for (let number of Object.values(CardNumber)) {
-        typeof suit !== "string" && typeof number !== "string" && this._startingCards.push(new Card(suit, number));
+  constructor(shoes: number) {
+    for (let i = 0; i < shoes; ++i) {
+      for (let suit of Object.values(Suit)) {
+        for (let number of Object.values(CardNumber)) {
+          typeof suit !== "string" && typeof number !== "string" && this._startingCards.push(new Card(suit, number));
+        }
       }
     }
     this.remainingCards = this._startingCards;
+    this.sort();
   }
   get cards() { return this.remainingCards }
   get length() { return this.remainingCards.length }
@@ -62,13 +88,15 @@ export class Deck {
   }
   reset() {
     this.remainingCards = this._startingCards;
+    this.sort();
   }
 }
 
 export class Hand {
   cards: Card[] = [];
-  draw(deck: Deck) {
+  draw(deck: Deck, hide?: boolean) {
     let card = deck.draw();
+    if (hide) card.hide();
     this.cards.push(card);
     return card;
   }
@@ -86,5 +114,27 @@ export class Hand {
 }
 
 export class Dealer extends Hand {
-  
+  game: CasinoGame;
+  deck: Deck;
+  hands: Hand[];
+  constructor(game: CasinoGame, deck?: Deck) {
+    super();
+    this.game = game;
+    this.deck = deck;
+    this.hands = [];
+  }
+  deal(hand: Hand) {
+    hand.draw(this.deck);
+  }
+  shuffle() {
+    this.deck.shuffle();
+  }
+  reset() {
+    this.deck.reset();
+  }
+  sitDown() {
+    let hand = new Hand();
+    this.hands.push(hand);
+    return hand;
+  }
 }

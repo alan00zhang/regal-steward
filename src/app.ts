@@ -30,6 +30,7 @@ client.once('ready', async () => {
 	await system.bank.loadNewUsers();
 	system.Salary.service();
 	// system.Meme.service();
+	system.Casino.service();
 });
 
 client.on('interactionCreate', async interaction => {

@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, GuildMember } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, GuildMember } from "discord.js";
 import { AppCommand } from "../types.js";
 import { System } from "../systems/systems.js";
 import { Utils } from "../utils.js";
@@ -20,35 +20,41 @@ export const CommandBlackjack: AppCommand = {
     // const command = system.createSingletonCommand(interaction);
 		// if (command === false) return;
     
+    let dealer = Casino.requestDealer("blackjack");
+    if (!dealer) {
+      interaction.reply({
+        content: `There's already a game of blackjack started in this channel.`,
+        ephemeral: true
+      });
+      return;
+    }
+
+    const joinButton = new ButtonBuilder()
+      .setCustomId("blackjack-join")
+      .setLabel("Join")
+      .setStyle(ButtonStyle.Success);
+
     let game = await interaction.reply({
-      content: `Dealing you in...`,
-      ephemeral: true
+      content: `Let's play a game of blackjack! Click below to join the table!`,
+      components: [new ActionRowBuilder<ButtonBuilder>().addComponents(joinButton)]
     });
+
+    // make collector! here
+
     // interaction.channel.send({
     //   content: `<@${member.id}> is playing a hand of blackjack...`
     // });
 
-    const deck = new Deck();
-    deck.shuffle();
-    const yourHand = new Hand();
-    const dealerHand = new Hand();
-    // yourHand.draw(deck)
-    // const img = await Casino.getCardPng(yourHand.cards[0].suit, yourHand.cards[0].number);
-    // interaction.followUp({
-    //   files: [img, img, img],
-    //   ephemeral: true
-    // })
-    let files = []
+    const yourHand = dealer.sitDown();
+    dealer.shuffle();
 
-    for (let i = 0; i < 5; ++i) {
-      await Utils.delay(1000);
-      let yCard = yourHand.draw(deck);
-      let dCard = dealerHand.draw(deck);
-      let img = await Casino.displayCards(yourHand.cards);
-      await game.edit({
-        files: [img]
-      })
-      // await game.edit(`${"Your hand:".padEnd(20)} ${yourHand}` + `\n${"Dealer's hand:".padEnd(20)} ${dealerHand}`);
-    }
+    // for (let i = 0; i < 5; ++i) {
+    //   await Utils.delay(1000);
+    //   dealer.deal(yourHand);
+    //   let img = await Casino.displayCards(yourHand.cards);
+    //   await game.edit({
+    //     files: [img]
+    //   })
+    // }
   }
 }
