@@ -1,3 +1,4 @@
+import { BLACKJACK_VALUES } from "../constants.js";
 import { UniqueKeySystemDatabase, UniqueSystemDatabase } from "../systems/database.js";
 import { Suit, CardNumber, CasinoGame } from "../types.js";
 import { Utils } from "../utils.js";
@@ -16,15 +17,15 @@ export class CasinoService extends SystemService {
       let dealer: Dealer;
       switch (game) {
         case "blackjack":
-          dealer = new Dealer("blackjack", new Deck(4));
+          dealer = new Dealer("blackjack", this, new Deck(4));
           this.dealers.store(dealer);
           break;
           case "roulette":
-          dealer = new Dealer("roulette");
+          dealer = new Dealer("roulette", this);
           this.dealers.store(dealer);
           break;
           case "poker":
-          dealer = new Dealer("poker", new Deck(4));
+          dealer = new Dealer("poker", this, new Deck(4));
           this.dealers.store(dealer);
           break;
       }
@@ -38,7 +39,11 @@ export class CasinoService extends SystemService {
   displayCards(cards: Card[]) {
     let paths = [];
     for (let card of cards) {
-      paths.push(`cards/${CardNumber[card.number]}_of_${Suit[card.suit]}.png`);
+      if (!card.hidden) {
+        paths.push(`cards/${CardNumber[card.number]}_of_${Suit[card.suit]}.png`);
+      } else {
+        paths.push(`cards/card_back.png`);
+      }
     }
     return Utils.getImage(paths, 100, 150);
   }
@@ -111,15 +116,27 @@ export class Hand {
     }
     return str;
   }
+  reveal() {
+    for (let card of this.cards) {
+      card.show();
+    }
+  }
+  conceal() {
+    for (let card of this.cards) {
+      card.hide();
+    }
+  }
 }
 
 export class Dealer extends Hand {
   game: CasinoGame;
+  Casino: CasinoService;
   deck: Deck;
   hands: Hand[];
-  constructor(game: CasinoGame, deck?: Deck) {
+  constructor(game: CasinoGame, Casino: CasinoService, deck?: Deck) {
     super();
     this.game = game;
+    this.Casino = Casino;
     this.deck = deck;
     this.hands = [];
   }
@@ -132,9 +149,25 @@ export class Dealer extends Hand {
   reset() {
     this.deck.reset();
   }
-  sitDown() {
+  getHand() {
     let hand = new Hand();
     this.hands.push(hand);
     return hand;
+  }
+  closeTable() {
+    this.Casino.dealers.deleteByID(this.game);
+  }
+  getBlackjackTotal(hand: Hand) {
+    let total = 0;
+    for (let card of hand.cards) {
+      let value: number;
+      if (card.number !== CardNumber.Ace) {
+        value = BLACKJACK_VALUES[card.number];
+      } else {
+        value = total < 11 ? 11 : 1;
+      }
+      total += value;
+    }
+    return total;
   }
 }
