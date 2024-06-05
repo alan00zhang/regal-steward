@@ -61,18 +61,20 @@ export const CommandBlackjack: AppCommand = {
         throw new Error("No one joined this blackjack table");
       })
       await Utils.delay(5_000);
+
       dealer.shuffle();
-      dealerStart(dealer, interaction.channel);
+      let dealerGame = new BlackjackGame(Casino, dealer, lobby);
+      dealerGame.dealerStart();
       let games: BlackjackGame[] = [];
       for (let player in players) {
-        games.push(new BlackjackGame(players[player], Casino, dealer));
+        games.push(new BlackjackGame(Casino, dealer, players[player]));
       }
       for (let game of games) {
         game.dealIn();
         game.finished.subscribe(() => {
           // if every game is finished
           if (games.every(instance => instance.finished.value)) {
-            
+            dealerGame.dealerEnd();
           }
         });
       }

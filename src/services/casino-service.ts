@@ -40,7 +40,7 @@ export class CasinoService extends SystemService {
     let paths = [];
     for (let card of cards) {
       if (!card.hidden) {
-        paths.push(`cards/${CardNumber[card.number]}_of_${Suit[card.suit]}.png`);
+        paths.push(`cards/${CardNumber[card.number].toLowerCase()}_of_${Suit[card.suit].toLowerCase()}.png`);
       } else {
         paths.push(`cards/card_back.png`);
       }

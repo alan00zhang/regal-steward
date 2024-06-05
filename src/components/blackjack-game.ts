@@ -8,10 +8,11 @@ export class BlackjackGame {
   interaction: InteractionResponse;
   Casino: CasinoService;
   dealer: Dealer;
+  dealerMsg?: Message;
   hand: Hand;
   finished = new BehaviorSubject<boolean>(false);
 
-  constructor(interaction: InteractionResponse, casino: CasinoService, dealer: Dealer) {
+  constructor(casino: CasinoService, dealer: Dealer, interaction: InteractionResponse) {
     this.interaction = interaction;
     this.Casino = casino;
     this.dealer = dealer;
@@ -27,7 +28,7 @@ export class BlackjackGame {
     collector.on("collect", async interaction => {
       if (interaction.customId === "hit") {
         this.hit();
-        interaction.update({});
+        // interaction.update({});
       } else if (interaction.customId === "stand") {
         this.stand();
         await this.interaction.edit({
@@ -37,7 +38,27 @@ export class BlackjackGame {
     })
   }
   async dealerStart() {
-    
+    let content = `The game has started! Welcome to the torture chamber. Dealer's hand (total: ${this.dealer.getBlackjackTotal(this.dealer)})`
+    let dealerMsg = await this.interaction.interaction.channel.send({
+      content: content
+    })
+    for (let i = 0; i < 2; ++i) {
+      await Utils.delay(1000);
+      this.dealer.draw(this.dealer.deck, i === 0);
+      let img = await this.Casino.displayCards(this.dealer.cards);
+      dealerMsg = await dealerMsg.edit({
+        content: content,
+        files: [img]
+      });
+    }
+    this.dealerMsg = dealerMsg;
+  }
+  async dealerEnd() {
+    this.dealer.reveal();
+    let img = await this.Casino.displayCards(this.dealer.cards);
+    await this.dealerMsg.edit({
+      files: [img]
+    })
   }
   async hit() {
     let hitButton = new ButtonBuilder()
