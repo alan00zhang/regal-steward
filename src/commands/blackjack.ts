@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteracti
 import { AppCommand } from "../types.js";
 import { System } from "../systems/systems.js";
 import { Utils } from "../utils.js";
-import { BlackjackGame } from './../components/blackjack-game.js';
+import { BlackjackDealer, BlackjackGame } from './../components/blackjack-game.js';
 import { Dealer } from "../services/casino-service.js";
 
 export const CommandBlackjack: AppCommand = {
@@ -63,7 +63,7 @@ export const CommandBlackjack: AppCommand = {
       await Utils.delay(5_000);
 
       dealer.shuffle();
-      let dealerGame = new BlackjackGame(Casino, dealer, lobby);
+      let dealerGame = new BlackjackDealer(Casino, dealer, lobby);
       dealerGame.dealerStart();
       let games: BlackjackGame[] = [];
       for (let player in players) {
@@ -87,25 +87,4 @@ export const CommandBlackjack: AppCommand = {
       dealer.closeTable();
     }
   }
-}
-
-async function dealerStart(dealer: Dealer, channel: GuildTextBasedChannel) {
-  let content = `The game has started! Welcome to the torture chamber. Dealer's hand (total: ${dealer.getBlackjackTotal(dealer)})`
-  let dealerMsg = await channel.send({
-    content: content
-  })
-  for (let i = 0; i < 2; ++i) {
-    await Utils.delay(1000);
-    dealer.draw(dealer.deck, i === 0);
-    let img = await dealer.Casino.displayCards(dealer.cards);
-    dealerMsg = await dealerMsg.edit({
-      content: content,
-      files: [img]
-    });
-  }
-  return dealerMsg;
-}
-
-async function dealerFinish(dealer: Dealer, gameMsg: GuildTextBasedChannel) {
-
 }

@@ -1,4 +1,3 @@
-import { BLACKJACK_VALUES } from "../constants.js";
 import { UniqueKeySystemDatabase, UniqueSystemDatabase } from "../systems/database.js";
 import { Suit, CardNumber, CasinoGame } from "../types.js";
 import { Utils } from "../utils.js";
@@ -45,7 +44,7 @@ export class CasinoService extends SystemService {
         paths.push(`cards/card_back.png`);
       }
     }
-    return Utils.getImage(paths, 100, 150);
+    return Utils.getImage(paths, 100, 150, 10);
   }
 }
 
@@ -156,18 +155,5 @@ export class Dealer extends Hand {
   }
   closeTable() {
     this.Casino.dealers.deleteByID(this.game);
-  }
-  getBlackjackTotal(hand: Hand) {
-    let total = 0;
-    for (let card of hand.cards) {
-      let value: number;
-      if (card.number !== CardNumber.Ace) {
-        value = BLACKJACK_VALUES[card.number];
-      } else {
-        value = total < 11 ? 11 : 1;
-      }
-      total += value;
-    }
-    return total;
   }
 }
