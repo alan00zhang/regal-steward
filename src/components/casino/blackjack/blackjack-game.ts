@@ -1,9 +1,11 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, InteractionResponse, Message } from "discord.js";
-import { CasinoService, Dealer, Hand } from "../services/casino-service.js";
-import { Utils } from "../utils.js";
-import { CardNumber } from "../types.js";
+import { CasinoService } from "../../../services/casino-service.js";
+import { Utils } from "../../../utils.js";
+import { CardNumber } from "../../../types.js";
 import { BehaviorSubject } from "rxjs";
-import { BLACKJACK_VALUES } from "../constants.js";
+import { BLACKJACK_VALUES } from "../../../constants.js";
+import { Dealer } from "../dealer.js";
+import { Hand } from "../hand.js";
 
 export class BlackjackGame {
   interaction: InteractionResponse;

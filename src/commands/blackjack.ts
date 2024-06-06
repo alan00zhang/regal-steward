@@ -2,8 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteracti
 import { AppCommand } from "../types.js";
 import { System } from "../systems/systems.js";
 import { Utils } from "../utils.js";
-import { BlackjackDealer, BlackjackGame } from './../components/blackjack-game.js';
-import { Dealer } from "../services/casino-service.js";
+import { BlackjackDealer, BlackjackGame } from '../components/casino/blackjack/blackjack-game.js';
 
 export const CommandBlackjack: AppCommand = {
   async execute(interaction: ChatInputCommandInteraction, system: System) {
