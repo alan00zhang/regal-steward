@@ -222,7 +222,7 @@ export class BlackjackDealerGame extends BlackjackGame {
     return total;
   }
   async dealerStart() {
-    let content = `The game has started! Welcome to the torture chamber.`
+    let content = `The game has started! Good luck.`
     this.message = await this.interaction.interaction.channel.send({
       content: content
     });

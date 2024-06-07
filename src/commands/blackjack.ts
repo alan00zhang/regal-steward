@@ -52,7 +52,7 @@ export const CommandBlackjack: AppCommand = {
           return;
         }
         let game = await joinInteraction.reply({
-          content: `Welcome to the table. \nThe game will start soon...`,
+          content: `Welcome to the table. You placed ${Utils.Units.bankPrefix} ${Utils.formatCurrency(bet)} on the line.\nThe game will start soon...`,
           ephemeral: true
         })
         players[player.id] = game;  
