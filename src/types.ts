@@ -16,9 +16,11 @@ export type AppCommand = {
   execute: (interaction: ChatInputCommandInteraction, system: System) => any
 }
 
-export type KeyValuePair<T> = {
-  [key: string]: T
+export type KeyValuePair<Key extends string | number | symbol, T> = {
+  [key in Key]: T;
 }
+
+export type PrimaryKeyObject<Key extends string> = KeyValuePair<Key, any> & { [k: string]: any }
 
 export class EventOptions {
   name: string;
@@ -39,3 +41,17 @@ export class SingletonCommand {
     this.system.removeSingletonCommand(this.id);
   }
 }
+
+export type NumericRange<
+  start extends number,
+  end extends number,
+  arr extends unknown[] = [],
+  acc extends number = never,
+> = arr['length'] extends end
+  ? acc | start | end
+  : NumericRange<start, end, [...arr, 1], arr[start] extends undefined ? acc : acc | arr['length']>;
+
+export enum Suit { Diamonds, Clubs, Hearts, Spades }
+export enum CardNumber { Ace = 1, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King }
+
+export type CasinoGame = "blackjack" | "roulette" | "poker"

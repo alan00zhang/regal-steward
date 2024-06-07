@@ -3,6 +3,10 @@ balance meme economy
   - if they can lose more money than they have, then debt must be handled
 
 climbing up the ladder
+- use discord roles as employee titles
+- each new title earns better casino rates
+  - and new games (?)
+  - and new privileges (what privileges?)
 
 more casino games
   - blackjack

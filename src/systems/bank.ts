@@ -1,7 +1,6 @@
 import sqlite3 from "sqlite3";
 import { Database, open } from "sqlite";
 import { UserAccount } from "../types.js";
-import { KeyValuePair } from "../types.js";
 import { System } from "./systems.js";
 
 // The Bank represents the SQLite database responsible for storing persistent user data
@@ -40,7 +39,7 @@ export class Bank {
   }
 
   async getCasinoLeaderboards() {
-    return await this.db.all(`SELECT CAST(id as text), casino_winnings, casino_losses FROM users ORDER BY casino_winnings DESC, bank_amount DESC`) as KeyValuePair<string | number>[];
+    return await this.db.all(`SELECT CAST(id as text), casino_winnings, casino_losses FROM users ORDER BY casino_winnings DESC, bank_amount DESC`) as Record<string, string | number>[];
   }
 
   async loadBanker() {
@@ -58,7 +57,7 @@ export class Bank {
 
   async loadNewUsers() { // TODO split each guild into its own table or schema in db
     let existingUsers = await this.getAllUserIds();
-    let newUsers: KeyValuePair<string>[] = [];
+    let newUsers: Record<string, string>[] = [];
     const guilds = await this.system.client.guilds.fetch();
     for (let [guildSnowflake, oauthGuild] of guilds) {
       let guild = await oauthGuild.fetch();

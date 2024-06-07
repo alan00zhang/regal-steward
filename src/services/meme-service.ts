@@ -1,20 +1,9 @@
-import { Client, TextChannel } from "discord.js";
+import { TextChannel } from "discord.js";
 import { Utils } from "../utils.js";
-import { System } from "../systems/systems.js";
-import { Bank } from "../systems/bank.js";
+import { SystemService } from "./service.js";
 
-export class MemeService {
-  client: Client;
-  system: System;
-  bank: Bank;
-  
-  constructor(system: System) {
-    this.client = system.client;
-    this.system = system;
-    this.bank = system.bank;
-  }
-
-  service() {
+export class MemeService extends SystemService {
+  service(): void {
     this.receiveMeme();
   }
 

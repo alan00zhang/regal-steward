@@ -21,9 +21,7 @@ const intents = [
 
 // Create a new client instance
 const client: Client = new Client({ intents: intents });
-// Use the system singleton in systemsJs so other files can use the same system without forming circular dependencies
 const system = new System(client);
-system.initServices();
 
 // When the client is ready, run this code (only once)
 client.once('ready', async () => {
@@ -32,6 +30,7 @@ client.once('ready', async () => {
 	await system.bank.loadNewUsers();
 	system.Salary.service();
 	// system.Meme.service();
+	system.Casino.service();
 });
 
 client.on('interactionCreate', async interaction => {

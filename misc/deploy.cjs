@@ -62,5 +62,14 @@ module.exports = {
       option.setName("bet")
         .setDescription(`How much ${utils.Units.bank} will you wager?`)
         .setRequired(true))
+  },
+  'blackjack': {
+    data: new SlashCommandBuilder()
+    .setName('blackjack')
+    .setDescription('Try your "hand" in god\'s fairest game!')
+    .addNumberOption(option => 
+      option.setName("bet")
+        .setDescription(`How much ${utils.Units.bank} will you wager?`)
+        .setRequired(true))
   }
 }

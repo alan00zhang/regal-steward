@@ -1,6 +1,5 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { Routes, Collection, Embed, ActionRowBuilder, TextInputBuilder, Client, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandOptionsOnlyBuilder, AnyComponentBuilder, APISelectMenuOption } from 'discord.js';
+import { ActionRowBuilder, TextInputBuilder, StringSelectMenuBuilder, APISelectMenuOption, AttachmentBuilder } from 'discord.js';
+import * as Canvas from '@napi-rs/canvas'
 
 export class Utils {
   static createSelectOptions(options: string[]): APISelectMenuOption[] {
@@ -48,6 +47,49 @@ export class Utils {
 
   static formatCurrency(val: number) {
     return (val).toLocaleString(undefined, { minimumFractionDigits: 2 });
+  }
+
+  static delay(time: number) {
+    return new Promise<void>(resolve => {
+      setTimeout(() => {
+        resolve()
+      }, time);
+    })
+  }
+
+  static async getImage(path: string[], width: number, height: number, gap?: number): Promise<AttachmentBuilder>
+  static async getImage(path: string, width: number, height: number): Promise<AttachmentBuilder>
+  static async getImage(path: string | string[], width: number, height: number, gap?: number) {
+    if (typeof path === "string") {
+      const canvas = Canvas.createCanvas(width, height);
+      const context = canvas.getContext("2d");
+      let imagePath = "src/assets/"
+      try {
+        const background = await Canvas.loadImage(imagePath + path);
+        context.drawImage(background, 0, 0, canvas.width, canvas.height);
+        return new AttachmentBuilder(await canvas.encode('png'));
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      let canvasWidth = width * path.length;
+      if (gap) canvasWidth += gap * (path.length - 1);
+      const canvas = Canvas.createCanvas(canvasWidth, height);
+      const context = canvas.getContext("2d");
+      let imagePath = "src/assets/";
+      let xPos = 0;
+      try {
+        for (let i = 0; i < path.length; ++i) {
+          const background = await Canvas.loadImage(imagePath + path[i]);
+          context.drawImage(background, xPos, 0, width, height);
+          xPos += width;
+          if (gap) xPos += gap;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      return new AttachmentBuilder(await canvas.encode('png'));
+    }
   }
 
   static Time = {
