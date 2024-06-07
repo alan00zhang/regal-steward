@@ -7,35 +7,28 @@ import { Dealer } from "../components/casino/dealer.js";
 import { Deck } from "../components/casino/deck.js";
 
 export class CasinoService extends SystemService {
-  dealers: UniqueKeySystemDatabase<"game">
+  dealers: UniqueKeySystemDatabase<"id">
   cardWidth = 150;
   cardHeight = 150;
   service(): void {
-    this.dealers = new UniqueKeySystemDatabase("dealers", "game");
+    this.dealers = new UniqueKeySystemDatabase("dealers", "id");
   }
 
   requestDealer(game: CasinoGame) {
-    if (!this.dealers.has(game)) {
-      let dealer: Dealer;
-      switch (game) {
-        case "blackjack":
-          dealer = new Dealer("blackjack", this, new Deck(4));
-          this.dealers.store(dealer);
-          break;
-          case "roulette":
-          dealer = new Dealer("roulette", this);
-          this.dealers.store(dealer);
-          break;
-          case "poker":
-          dealer = new Dealer("poker", this, new Deck(4));
-          this.dealers.store(dealer);
-          break;
+    let dealer: Dealer;
+    switch (game) {
+      case "blackjack":
+        dealer = new Dealer(game, this, new Deck(4));
+        break;
+        case "roulette":
+        dealer = new Dealer(game, this);
+        break;
+        case "poker":
+        dealer = new Dealer(game, this, new Deck(4));
+        break;
       }
-      return dealer;
-    } else {
-      return false;
-      // return this.dealers.getByID(game) as Dealer;
-    }
+    this.dealers.store(dealer);
+    return dealer;
   }
 
   displayCards(cards: Card[]) {
