@@ -36,7 +36,7 @@ export const CommandBlackjack: AppCommand = {
       .setLabel("Join")
       .setStyle(ButtonStyle.Success);
 
-    let lobbyMesssage = `Let's play a game of blackjack! Click below to join the table!\nThe bet for this table is ${Utils.Units.bankPrefix} ${Utils.formatCurrency(bet)}`;
+    let lobbyMesssage = `Let's play a game of blackjack! Click below to join the table!\nThe bet for this table is ${Utils.Units.bankPrefix} ${Utils.formatCurrency(bet)} (%d)`;
     let lobby = await interaction.reply({
       content: lobbyMesssage,
       components: [new ActionRowBuilder<ButtonBuilder>().addComponents(joinButton)]
@@ -55,11 +55,12 @@ export const CommandBlackjack: AppCommand = {
           content: `Welcome to the table. \nThe game will start soon...`,
           ephemeral: true
         })
+        lobbyMesssage += `\n<@${player.id}> joined this table.`
         players[player.id] = game;  
       });
       for (let i = 10; i > 0; --i) {
         lobby.edit({
-          content: lobbyMesssage + ` (${i})`
+          content: lobbyMesssage.replace("%d", i.toString())
         })
         await Utils.delay(1000);
       }

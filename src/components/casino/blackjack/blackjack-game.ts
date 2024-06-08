@@ -131,7 +131,7 @@ export class BlackjackGame {
   }
   async subscribeToDealer(game: BlackjackDealerGame) {
     this.subscriptions.add(game.finished$.subscribe(value => {
-      if (value) {
+      if (value && this.score$.value === undefined) {
         if (value === "bust") {
           this.payout();
         } else if (value === "blackjack") {
@@ -182,7 +182,7 @@ export class BlackjackGame {
     this.endGame(-this.bet);
   }
   async endGame(score: number) {
-    this.score$.next(score);
+    if (this.score$.value === undefined) this.score$.next(score);
     this.subscriptions.unsubscribe();
   }
 }
