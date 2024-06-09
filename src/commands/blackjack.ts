@@ -43,8 +43,7 @@ export const CommandBlackjack: AppCommand = {
           joinInteraction.update({});
           return;
         }
-        let member = <GuildMember>interaction.member;
-        let userAccount = await system.bank.getUserAccount(member.id);
+        let userAccount = await system.bank.getUserAccount(player.id);
         if (userAccount.bankBalance < bet || bet < 0) {
           await interaction.reply({
             content: "You can't afford that.",
