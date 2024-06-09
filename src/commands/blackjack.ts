@@ -4,21 +4,13 @@ import { System } from "../systems/systems.js";
 import { Utils } from "../utils.js";
 import { BlackjackDealerGame, BlackjackGame } from '../components/casino/blackjack/blackjack-game.js';
 import { Subscription } from "rxjs";
+import { BankAccount } from "../systems/bank.js";
 
 export const CommandBlackjack: AppCommand = {
   async execute(interaction: ChatInputCommandInteraction, system: System) {
     const bet = Math.round(interaction.options.getNumber("bet") * 1e2) / 1e2; // round to .00 decimals
-    let member = <GuildMember>interaction.member;
-    let userAccount = await system.bank.getUserAccount(member.id);
-		const banker = await system.bank.getUserAccount("bank");
     const Casino = system.Casino;
-    if (userAccount.bankBalance < bet || bet < 0) {
-      await interaction.reply({
-        content: "You can't afford that.",
-        ephemeral: true
-      });
-      return;
-    }
+    const banker = await system.bank.getUserAccount("bank");
     const command = system.createSingletonCommand(interaction);
 		if (command === false) return;
     
@@ -44,11 +36,20 @@ export const CommandBlackjack: AppCommand = {
     let subscriptions = new Subscription();
     try {
       const lobbyCollector = lobby.createMessageComponentCollector({ componentType: ComponentType.Button });
-      let players: Record<string, InteractionResponse> = {}
+      let players: Record<string, {game: InteractionResponse, userAccount: BankAccount}> = {}
       lobbyCollector.on("collect", async joinInteraction => {
         let player = <GuildMember>joinInteraction.member;
         if (players[player.id]) {
           joinInteraction.update({});
+          return;
+        }
+        let member = <GuildMember>interaction.member;
+        let userAccount = await system.bank.getUserAccount(member.id);
+        if (userAccount.bankBalance < bet || bet < 0) {
+          await interaction.reply({
+            content: "You can't afford that.",
+            ephemeral: true
+          });
           return;
         }
         let game = await joinInteraction.reply({
@@ -56,7 +57,7 @@ export const CommandBlackjack: AppCommand = {
           ephemeral: true
         })
         lobbyMesssage += `\n<@${player.id}> joined this table.`
-        players[player.id] = game;  
+        players[player.id] = {game, userAccount};  
       });
       for (let i = 10; i > 0; --i) {
         lobby.edit({
@@ -72,7 +73,7 @@ export const CommandBlackjack: AppCommand = {
       dealerGame.dealerStart();
       let games: BlackjackGame[] = [];
       for (let player in players) {
-        games.push(new BlackjackGame(Casino, dealer, players[player], bet, userAccount));
+        games.push(new BlackjackGame(Casino, dealer, players[player].game, bet, players[player].userAccount));
       }
       // await dealer blackjack
       for (let game of games) {
