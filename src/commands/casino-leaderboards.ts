@@ -10,7 +10,7 @@ export const CommandCasinoLeaderboards: AppCommand = {
     let response = `**CASINO TOP 5 GAMBLING GODS**\n`;
     for (let i = 0; i < top5.length; i++) {
       let winnings = top5[i]['casino_winnings'] as number / 100;
-      let losses = top5[i]['casino_winnings'] as number / 100;
+      let losses = top5[i]['casino_losses'] as number / 100;
       response += `
       ${i+1}. <@${top5[i]["CAST(id as text)"]}>
       Total Winnings: ${Utils.Units.bankPrefix} ${Utils.formatCurrency(winnings)}
