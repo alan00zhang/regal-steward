@@ -69,7 +69,7 @@ export const CommandCrownAndAnchor: AppCommand = {
 		});
     // GAME STARTED
     try {
-      let gameStart = await suitPicker.awaitMessageComponent({filter: async i => i.customId === "caa-start", time: 5000});
+      let gameStart = await suitPicker.awaitMessageComponent({filter: async i => i.customId === "caa-start", time: Utils.Time.MINUTE5});
   
       let [r1, r2, r3] = [roll(), roll(), roll()];
       let response = `<@${member.id}> is playing a game of Crown and Anchor\n\nThey picked ${selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
@@ -122,12 +122,6 @@ export const CommandCrownAndAnchor: AppCommand = {
         content: finalResponse,
         ephemeral: true
       });
-  
-      let announcement = wins 
-      ? `<@${member.id}> has won ${Utils.Units.bankPrefix} ${Utils.formatCurrency(winAmount)} playing Crown and Anchor!` 
-      : `<@${member.id}> has lost ${Utils.Units.bankPrefix} ${Utils.formatCurrency(winAmount)} playing Crown and Anchor!`;
-      announcement += `\n\nThere is ${Utils.Units.bankPrefix} ${banker.bankBalanceString} in the jackpot.`
-      interaction.channel.send(announcement);
     } catch {
       interaction.editReply({ content: 'You did not select a suit in time, exiting game...', components: [] });
       collector.stop();

@@ -30,7 +30,7 @@ export const CommandBlackjack: AppCommand = {
 
     let lobbyMesssage = `Let's play a game of blackjack! Click below to join the table!\nThe bet for this table is ${Utils.Units.bankPrefix} ${Utils.formatCurrency(bet)} (%d)`;
     let lobby = await interaction.reply({
-      content: lobbyMesssage,
+      content: lobbyMesssage.replace("(%d)", ""),
       components: [new ActionRowBuilder<ButtonBuilder>().addComponents(joinButton)]
     });
     let subscriptions = new Subscription();
