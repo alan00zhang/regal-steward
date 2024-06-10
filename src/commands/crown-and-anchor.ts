@@ -75,8 +75,7 @@ export const CommandCrownAndAnchor: AppCommand = {
       let response = `<@${member.id}> is playing a game of Crown and Anchor\n\nThey picked ${selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
   
       await gameStart.reply({
-        content: response,
-        ephemeral: true
+        content: response
       });
 
       let wins = [r1, r2, r3].filter(x => x === selectedSuit).length;
