@@ -37,6 +37,7 @@ export const CommandBlackjack: AppCommand = {
     try {
       const lobbyCollector = lobby.createMessageComponentCollector({ componentType: ComponentType.Button });
       let players: Record<string, {game: InteractionResponse, userAccount: BankAccount}> = {}
+      let countdown = 10;
       lobbyCollector.on("collect", async joinInteraction => {
         let player = <GuildMember>joinInteraction.member;
         if (players[player.id]) {
@@ -56,13 +57,17 @@ export const CommandBlackjack: AppCommand = {
           ephemeral: true
         })
         lobbyMesssage += `\n<@${player.id}> joined this table.`
+        lobby.edit({
+          content: lobbyMesssage.replace("%d", countdown.toString())
+        })
         players[player.id] = {game, userAccount};  
       });
-      for (let i = 100; i > 0; --i) {
+      for (let i = 10; i > 0; --i) {
+        countdown = i;
         lobby.edit({
-          content: lobbyMesssage.replace("%d", Math.floor(i / 10).toString())
+          content: lobbyMesssage.replace("%d", countdown.toString())
         })
-        await Utils.delay(100);
+        await Utils.delay(1000);
       }
       lobbyCollector.stop();
       if (Object.keys(players).length === 0) throw new Error("No players!")
