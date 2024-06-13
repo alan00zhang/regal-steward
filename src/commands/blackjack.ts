@@ -58,11 +58,11 @@ export const CommandBlackjack: AppCommand = {
         lobbyMesssage += `\n<@${player.id}> joined this table.`
         players[player.id] = {game, userAccount};  
       });
-      for (let i = 10; i > 0; --i) {
+      for (let i = 100; i > 0; --i) {
         lobby.edit({
-          content: lobbyMesssage.replace("%d", i.toString())
+          content: lobbyMesssage.replace("%d", Math.floor(i / 10).toString())
         })
-        await Utils.delay(1000);
+        await Utils.delay(100);
       }
       lobbyCollector.stop();
       if (Object.keys(players).length === 0) throw new Error("No players!")
@@ -87,7 +87,7 @@ export const CommandBlackjack: AppCommand = {
           if (games.every(instance => instance.score$.value !== undefined)) {
             let content = `All hands paid out, thanks for playing blackjack! This dealer is closing down.`;
             for (let game of games) {
-              let outcome = game.score$.value < 0 ? "lost" : "won";
+              let outcome = game.score$.value < 0 ? "lost" : game.score$.value > 0 ? "won" : "tied";
               let score = Math.abs(game.score$.value);
               if (game.score$.value < 0) {
                 game.userAccount.subtractBank(score);
@@ -97,7 +97,8 @@ export const CommandBlackjack: AppCommand = {
                 game.userAccount.addBank(score);
                 game.userAccount.addCasinoWinnings(score);
               }
-              content += `\n<@${game.interaction.interaction.user.id}> played and ${outcome} ${Utils.Units.bankPrefix} ${Utils.formatCurrency(score)}`;
+              content += `\n<@${game.interaction.interaction.user.id}> played and ${outcome}`;
+              if (outcome !== "tied") content += ` ${Utils.Units.bankPrefix} ${Utils.formatCurrency(score)}`;
             }
             interaction.channel.send({
               content: content

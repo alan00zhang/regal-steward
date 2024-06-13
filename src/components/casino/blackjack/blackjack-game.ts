@@ -197,7 +197,9 @@ export class BlackjackDealerGame extends BlackjackGame {
   }
   get total() {
     let total = 0;
-    for (let card of this.dealer.cards) {
+    let cards = structuredClone(this.dealer.cards);
+    cards.sort((a, b) => b.number - a.number);
+    for (let card of cards) {
       let value: number;
       if (card.hidden) {
         value = 0;
