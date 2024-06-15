@@ -10,7 +10,7 @@ const outcomes: APISelectMenuOption[] = [
   { label: "Spades", value: "spades" },
   { label: "Hearts", value: "hearts" },
   { label: "Clubs", value: "clubs" },
-  { label: "Dimaonds", value: "diamonds" },
+  { label: "Diamonds", value: "diamonds" },
 ]
 const roll = () => {
   return outcomes[Math.floor(Math.random() * outcomes.length)].value;
