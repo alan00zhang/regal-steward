@@ -6,8 +6,7 @@ const __dirname = dirname(__filename);
 import * as dotenv from "dotenv";
 dotenv.config({path: __dirname + '/.env'});
 import { System } from './systems/systems.js';
-import { Client, GatewayIntentBits, GuildMember } from 'discord.js';
-import { Utils } from './utils.js';
+import { Client, GatewayIntentBits } from 'discord.js';
 import { AppCommand } from './types.js';
 
 const intents = [
@@ -16,7 +15,8 @@ const intents = [
 	GatewayIntentBits.DirectMessages,
 	GatewayIntentBits.GuildMembers,
 	GatewayIntentBits.MessageContent,
-	GatewayIntentBits.GuildMessageReactions
+	GatewayIntentBits.GuildMessageReactions,
+	GatewayIntentBits.GuildVoiceStates
 ]
 
 // Create a new client instance
@@ -29,8 +29,9 @@ client.once('ready', async () => {
 	await system.bank.open();
 	await system.bank.loadNewUsers();
 	system.Salary.service();
-	// system.Meme.service();
 	system.Casino.service();
+	system.Audio.service();
+	// system.Meme.service();
 });
 
 client.on('interactionCreate', async interaction => {
@@ -38,7 +39,7 @@ client.on('interactionCreate', async interaction => {
 	const command: AppCommand = system.getCommand(interaction.commandName);
 	if (!command) return;
 	try {
-		await command.execute(interaction, system);
+		// await command.execute(interaction, system);
 	} catch (error) {
 		// Disconnect from the database
 		await system.bank.close();
