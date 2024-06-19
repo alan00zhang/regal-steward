@@ -12,6 +12,8 @@ Welcome to the **Regal Steward** repository! This app aims to be easily extended
 
 ## Getting Started
 
+0. Install node.js (Latest LTS version recommended) and TypeScript
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/alan00zhang/discord-bot.git
@@ -26,6 +28,8 @@ Welcome to the **Regal Steward** repository! This app aims to be easily extended
 3. Configure your bot with your Discord token in a `.env` file:
    ```env
    DISCORD_TOKEN=your_token_here
+   APP_ID=your_app_id
+   GUILD_ID=your_server_id
    ```
 
 4. Run the build script and create the database:
@@ -34,7 +38,12 @@ Welcome to the **Regal Steward** repository! This app aims to be easily extended
    cp regal-steward-template.db regal-steward.db
    ```
 
-5. Start the bot:
+5. Deploy the commands onto your server:
+   ```bash
+   node ./misc/deploy-commands.cjs
+   ```
+
+6. Start the bot:
    ```bash
    pm2 start ./dist/app.js
    ```
