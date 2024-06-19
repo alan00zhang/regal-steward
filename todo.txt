@@ -7,6 +7,14 @@ climbing up the ladder
 - each new title earns better casino rates
   - and new games (?)
   - and new privileges (what privileges?)
+- new titles earn more base salary, or maybe is a salary multiplier
+
+shop
+  - shop with items
+  - one message, dedicated channel format
+  - how to browse a large list?
+  - each item improves user's salary marginally
+  - items are productivity themed, keeping with bot's corporate theme
 
 more casino games
   - blackjack
