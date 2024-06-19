@@ -4,6 +4,7 @@ import YTSR from "@distube/ytsr";
 import YTDL from "ytdl-core";
 import { Message } from "discord.js";
 import { UniqueKeySystemDatabase } from "../systems/database.js";
+import { AudioDownloader } from "../components/audio/audio-downloader.js";
 
 export class AudioService extends SystemService {
   players: UniqueKeySystemDatabase<"guildId">;
@@ -81,10 +82,10 @@ export class AudioService extends SystemService {
     connection.subscribe(player);
   }
   async startSong(songName: string, player: AudioPlayer) {
-    const songUrl = (await YTSR(songName, { limit: 1 })).items[0];
-    const song = YTDL(songUrl.url);
-    const audio = createAudioResource(song, {inlineVolume: true});
-    audio.volume.setVolume(0.05)
+    const videoResult = (await YTSR(songName + "official audio", { limit: 1 })).items[0];
+    const song = await AudioDownloader.download(videoResult.url)
+    const audio = createAudioResource(song, {inlineVolume: false, inputType: StreamType.Opus});
+    // audio.volume.setVolume(0.5)
     player.play(audio);
   }
   teardown() {
