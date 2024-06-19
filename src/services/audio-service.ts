@@ -1,15 +1,16 @@
 import { SystemService } from "./service.js";
 import { AudioPlayer, StreamType, VoiceConnectionStatus, createAudioPlayer, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import YTSR from "@distube/ytsr";
+import YTDL from "ytdl-core";
 import { Message } from "discord.js";
 import { UniqueKeySystemDatabase } from "../systems/database.js";
 
 export class AudioService extends SystemService {
-  // private player: AudioPlayer;
   players: UniqueKeySystemDatabase<"guildId">;
   service(): void {
     this.players = new UniqueKeySystemDatabase("players", "guildId");
     this.listenToPlay();
+    this.listenToPause();
     this.listenToStop();
     this.listenToLeave();
   }
@@ -17,13 +18,14 @@ export class AudioService extends SystemService {
     this.system.client.on("messageCreate", message => {
       if (message.content.startsWith("!play") && message.member.voice.channel?.id) {
         this.join(message);
+        this.play(message);
       }
     });
   }
   listenToPause() {
     this.system.client.on("messageCreate", message => {
       if (message.content.startsWith("!pause")) {
-        const player = this.players.getByID(message.guildId);
+        const player = this.players.getByID(message.guildId).player;
         player?.pause();
       }
     });
@@ -31,7 +33,7 @@ export class AudioService extends SystemService {
   listenToStop() {
     this.system.client.on("messageCreate", message => {
       if (message.content.startsWith("!stop")) {
-        const player = this.players.getByID(message.guildId);
+        const player = this.players.getByID(message.guildId).player;
         player?.stop();
       }
     });
@@ -58,7 +60,6 @@ export class AudioService extends SystemService {
         try {
           await entersState(connection, VoiceConnectionStatus.Connecting, 5000)
         } catch {
-          console.log("REAL DISCONNECT")
           connection.destroy();
           player.stop();
           this.players.deleteByID(message.guildId);
@@ -70,6 +71,21 @@ export class AudioService extends SystemService {
       player: player,
       connection: connection
     }, true);
+  }
+  play(message: Message) {
+    const player: AudioPlayer = this.players.getByID(message.guildId).player;
+    let connection = getVoiceConnection(message.guildId);
+    let songName = message.content.match(/^!play (.+)/)?.[1] // matches !play (some song name)
+    songName && this.startSong(songName, player);
+    player.unpause();
+    connection.subscribe(player);
+  }
+  async startSong(songName: string, player: AudioPlayer) {
+    const songUrl = (await YTSR(songName, { limit: 1 })).items[0];
+    const song = YTDL(songUrl.url);
+    const audio = createAudioResource(song, {inlineVolume: true});
+    audio.volume.setVolume(0.05)
+    player.play(audio);
   }
   teardown() {
     // iterate through connections and destroy all
