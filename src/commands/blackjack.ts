@@ -5,6 +5,7 @@ import { Utils } from "../utils.js";
 import { BlackjackDealerGame, BlackjackGame } from '../components/casino/blackjack/blackjack-game.js';
 import { Subscription } from "rxjs";
 import { BankAccount } from "../systems/bank.js";
+import { UNITS } from "../constants.js";
 
 export const CommandBlackjack: AppCommand = {
   async execute(interaction: ChatInputCommandInteraction, system: System) {
@@ -28,7 +29,7 @@ export const CommandBlackjack: AppCommand = {
       .setLabel("Join")
       .setStyle(ButtonStyle.Success);
 
-    let lobbyMesssage = `Let's play a game of blackjack! Click below to join the table!\nThe bet for this table is ${Utils.Units.bankPrefix} ${Utils.formatCurrency(bet)} (%d)`;
+    let lobbyMesssage = `Let's play a game of blackjack! Click below to join the table!\nThe bet for this table is ${UNITS.bankPrefix} ${Utils.formatCurrency(bet)} (%d)`;
     let lobby = await interaction.reply({
       content: lobbyMesssage.replace("(%d)", ""),
       components: [new ActionRowBuilder<ButtonBuilder>().addComponents(joinButton)]
@@ -103,7 +104,7 @@ export const CommandBlackjack: AppCommand = {
                 game.userAccount.addCasinoWinnings(score);
               }
               content += `\n<@${game.interaction.interaction.user.id}> played and ${outcome}`;
-              if (outcome !== "tied") content += ` ${Utils.Units.bankPrefix} ${Utils.formatCurrency(score)}`;
+              if (outcome !== "tied") content += ` ${UNITS.bankPrefix} ${Utils.formatCurrency(score)}`;
             }
             interaction.channel.send({
               content: content

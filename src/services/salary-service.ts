@@ -1,3 +1,4 @@
+import { TIME } from '../constants.js';
 import { Utils } from '../utils.js';
 import { SystemService } from './service.js';
 
@@ -6,7 +7,7 @@ export class SalaryService extends SystemService {
     this.paySalaries();
     setInterval(() => {
       this.paySalaries();
-    }, Utils.Time.MINUTE30);
+    }, TIME.MINUTE30);
   }
 
   async paySalaries() {

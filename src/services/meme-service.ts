@@ -1,6 +1,6 @@
 import { TextChannel } from "discord.js";
-import { Utils } from "../utils.js";
 import { SystemService } from "./service.js";
+import { TIME, UNITS } from "../constants.js";
 
 export class MemeService extends SystemService {
   service(): void {
@@ -40,7 +40,7 @@ export class MemeService extends SystemService {
           }
         }
 
-        await msg.awaitReactions({filter, time: Utils.Time.HOUR8});
+        await msg.awaitReactions({filter, time: TIME.HOUR8});
         let pay = 0;
         let badMemeCount = 0;
 
@@ -63,15 +63,15 @@ export class MemeService extends SystemService {
         }
         if (pay > 0) {
           msg.channel.send({
-            content: `<@${memberId}>, thank you for your contribution to the economy.\nYou have earned ${Utils.Units.bankPrefix} ${(pay / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your GOOD meme.`
+            content: `<@${memberId}>, thank you for your contribution to the economy.\nYou have earned ${UNITS.bankPrefix} ${(pay / 100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your GOOD meme.`
           });
         } else if (pay < 0) {
           msg.channel.send({
-            content: `<@${memberId}>, thank you for your contribution to the economy.\nYou have been fined ${Utils.Units.bankPrefix} ${(pay / -100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your BAD meme.`
+            content: `<@${memberId}>, thank you for your contribution to the economy.\nYou have been fined ${UNITS.bankPrefix} ${(pay / -100).toLocaleString(undefined, {minimumFractionDigits: 2})} for your BAD meme.`
           });
         } else if (reactions.length === 0) {
           msg.channel.send({
-            content: `<@${memberId}>, thank you for your contribution to the economy. Unfortunately no one was engaged with your meme.\nYou have been paid ${Utils.Units.bankPrefix} 50.00 out of pity.`
+            content: `<@${memberId}>, thank you for your contribution to the economy. Unfortunately no one was engaged with your meme.\nYou have been paid ${UNITS.bankPrefix} 50.00 out of pity.`
           });
           await userAccount.addMemeEarnings(5000);
         } else if (pay === 0) {

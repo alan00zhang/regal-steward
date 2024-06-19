@@ -1,8 +1,7 @@
 import { System } from '../systems/systems.js';
-import { SlashCommandBuilder, ChatInputCommandInteraction, GuildMember } from 'discord.js';
-import { Utils } from '../utils.js';
-import { BankAccount } from '../systems/bank.js';
+import { ChatInputCommandInteraction, GuildMember } from 'discord.js';
 import { AppCommand } from '../types.js';
+import { UNITS } from '../constants.js';
 
 export const CommandTip: AppCommand = {
 	async execute(interaction: ChatInputCommandInteraction, system: System) {
@@ -32,11 +31,11 @@ export const CommandTip: AppCommand = {
     await recipientAccount.addBank(tip);
 
 		await interaction.reply({
-      content: `<@${member.id}> tipped <@${tippee.id}> ${Utils.Units.bankPrefix} ${Number(tip).toLocaleString(undefined, {minimumFractionDigits: 2})}`
+      content: `<@${member.id}> tipped <@${tippee.id}> ${UNITS.bankPrefix} ${Number(tip).toLocaleString(undefined, {minimumFractionDigits: 2})}`
     });
     
 		await interaction.followUp({
-      content: `You have ${bankAccount.bankBalanceString} ${Utils.Units.bank} left in your account.`,
+      content: `You have ${bankAccount.bankBalanceString} ${UNITS.bank} left in your account.`,
       ephemeral: true
     });
     return;

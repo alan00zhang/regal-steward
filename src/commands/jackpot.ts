@@ -1,7 +1,8 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, GuildMember } from 'discord.js';
+import { ChatInputCommandInteraction, GuildMember } from 'discord.js';
 import { Utils } from '../utils.js';
 import { System } from '../systems/systems.js';
 import { AppCommand } from '../types.js';
+import { UNITS } from '../constants.js';
 
 export const CommandJackpot: AppCommand = {
 	async execute(interaction: ChatInputCommandInteraction, system: System) {
@@ -12,8 +13,8 @@ export const CommandJackpot: AppCommand = {
 		// cap the betCost at 100,000.00
 		if (betCost > 100_000.00) betCost = 100_000.00;
 		if (interaction.options.getSubcommand() === "check") {
-			let response = `The jackpot is currently valued at ${Utils.Units.bankPrefix} ${banker.bankBalanceString}.
-			The cost of a jackpot bet is ${Utils.Units.bankPrefix} ${Utils.formatCurrency(betCost)}.`;
+			let response = `The jackpot is currently valued at ${UNITS.bankPrefix} ${banker.bankBalanceString}.
+			The cost of a jackpot bet is ${UNITS.bankPrefix} ${Utils.formatCurrency(betCost)}.`;
 			await interaction.reply({
 				content: response,
 				ephemeral: true
@@ -33,7 +34,7 @@ export const CommandJackpot: AppCommand = {
 				await bankAccount.addBank(banker.bankBalance);
 				await bankAccount.addCasinoWinnings(banker.bankBalance);
 				await banker.subtractBank(banker.bankBalance);
-				response += `**Congratulations! <@${member.id}> just won the BIG POT of ${Utils.Units.bankPrefix} ${banker.bankBalanceString}!!!**`
+				response += `**Congratulations! <@${member.id}> just won the BIG POT of ${UNITS.bankPrefix} ${banker.bankBalanceString}!!!**`
 			} else if (roll > 90) {
 				await bankAccount.addCasinoLosses(betCost);
 				response += `🇱 Soo close... try again?`
@@ -45,7 +46,7 @@ export const CommandJackpot: AppCommand = {
 				content: response
 			});
 			await interaction.followUp({
-				content: `You have ${Utils.formatCurrency(bankAccount.bankBalance)} ${Utils.Units.bank} left in your account.`,
+				content: `You have ${Utils.formatCurrency(bankAccount.bankBalance)} ${UNITS.bank} left in your account.`,
 				ephemeral: true
 			});
 		}
