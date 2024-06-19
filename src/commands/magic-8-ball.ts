@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction } from "discord.js";
 import { AppCommand } from "../types.js";
-import { SlashCommandBuilder } from 'discord.js';
 
 const whatResponses = [
 	"I'm not quite sure.",

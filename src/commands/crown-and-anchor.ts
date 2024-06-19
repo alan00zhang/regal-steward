@@ -1,9 +1,9 @@
-import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ChatInputCommandInteraction, GuildMember, Interaction, APISelectMenuOption } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ChatInputCommandInteraction, GuildMember, APISelectMenuOption } from 'discord.js';
 import { Utils } from '../utils.js';
 import { System } from '../systems/systems.js';
 import { AppCommand } from '../types.js';
+import { TIME, UNITS } from '../constants.js';
 
-const commandName = "crown-and-anchor";
 const outcomes: APISelectMenuOption[] = [
   { label: "Crowns", value: "crown" },
   { label: "Anchors", value: "anchor" },
@@ -47,7 +47,7 @@ export const CommandCrownAndAnchor: AppCommand = {
 		// also updates the message with the Start Game button
     let selectedSuit: string;
 		const collector = suitPicker.createMessageComponentCollector(
-      { componentType: ComponentType.StringSelect, time: Utils.Time.MINUTE5 }
+      { componentType: ComponentType.StringSelect, time: TIME.MINUTE5 }
     );
 		collector.on('collect', async i => {
       const startGameRow = new ActionRowBuilder<ButtonBuilder>()
@@ -69,7 +69,7 @@ export const CommandCrownAndAnchor: AppCommand = {
 		});
     // GAME STARTED
     try {
-      let gameStart = await suitPicker.awaitMessageComponent({filter: async i => i.customId === "caa-start", time: Utils.Time.MINUTE5});
+      let gameStart = await suitPicker.awaitMessageComponent({filter: async i => i.customId === "caa-start", time: TIME.MINUTE5});
   
       let [r1, r2, r3] = [roll(), roll(), roll()];
       let response = `<@${member.id}> is playing a game of Crown and Anchor\n\nThey picked ${selectedSuit}! \nThey rolled... \n:${r1}: :${r2}: :${r3}:`;
@@ -115,8 +115,8 @@ export const CommandCrownAndAnchor: AppCommand = {
         ]);
       }
       let finalResponse = `Your suit came up ${wins} times.\n`
-      finalResponse += wins ? `You won ${Utils.formatCurrency(winAmount)} ${Utils.Units.bank}!` : `You lose! You lose!`;
-      finalResponse += `\nYou have ${Utils.Units.bankPrefix} ${userAccount.bankBalanceString} left in your account.`
+      finalResponse += wins ? `You won ${Utils.formatCurrency(winAmount)} ${UNITS.bank}!` : `You lose! You lose!`;
+      finalResponse += `\nYou have ${UNITS.bankPrefix} ${userAccount.bankBalanceString} left in your account.`
       await gameStart.followUp({
         content: finalResponse,
         ephemeral: true

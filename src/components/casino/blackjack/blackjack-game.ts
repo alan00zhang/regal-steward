@@ -3,7 +3,7 @@ import { CasinoService } from "../../../services/casino-service.js";
 import { Utils } from "../../../utils.js";
 import { CardNumber, SingletonCommand } from "../../../types.js";
 import { BehaviorSubject, Subject, Subscription } from "rxjs";
-import { BLACKJACK_VALUES } from "../../../constants.js";
+import { BLACKJACK_VALUES, TIME } from "../../../constants.js";
 import { Dealer } from "../dealer.js";
 import { Hand } from "../hand.js";
 import { BankAccount } from "../../../systems/bank.js";
@@ -62,7 +62,7 @@ export class BlackjackGame {
     }
   }
   private async startCollector() {
-    this.collector = this.message.createMessageComponentCollector({ componentType: ComponentType.Button, time: Utils.Time.MINUTE5});
+    this.collector = this.message.createMessageComponentCollector({ componentType: ComponentType.Button, time: TIME.MINUTE5});
     this.collector.on("collect", async interaction => {
       if (interaction.customId === ("hit")) {
         let total = await this.hit();
