@@ -39,7 +39,7 @@ client.on('interactionCreate', async interaction => {
 	const command: AppCommand = system.getCommand(interaction.commandName);
 	if (!command) return;
 	try {
-		// await command.execute(interaction, system);
+		await command.execute(interaction, system);
 	} catch (error) {
 		// Disconnect from the database
 		await system.bank.close();
