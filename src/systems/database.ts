@@ -15,6 +15,7 @@ export abstract class AbstractSystemDatabase<T> {
   abstract deleteByIndex(index: number): void;
 }
 
+// Basic database (array-based)
 export class BasicSystemDatabase<T> extends AbstractSystemDatabase<T> {
   protected _db: T[];
 
@@ -46,6 +47,7 @@ export class BasicSystemDatabase<T> extends AbstractSystemDatabase<T> {
   }
 }
 
+// Unique database, uniqueness is evaluated on total equality (===)
 export class UniqueSystemDatabase<T> extends BasicSystemDatabase<T> {
   constructor(name: string) {
     super(name);
@@ -61,11 +63,12 @@ export class UniqueSystemDatabase<T> extends BasicSystemDatabase<T> {
       super.store(item);
     } else {
       if (overwrite) existingItem = item;
-      throw new Error(`Tried to store ${item}, but item already exists in DB ${this.name}. Try specifying overwrite flag.`)
+      else throw new Error(`Tried to store ${item}, but item already exists in DB ${this.name}. Try specifying overwrite flag.`)
     }
   }
 }
 
+// Unique database, uniqueness is based on item.key's value. There can be many similar items as long as item.key is different
 export class UniqueKeySystemDatabase<Key extends string> extends BasicSystemDatabase<PrimaryKeyObject<Key>> {
   primaryKey: Key;
   
@@ -88,7 +91,7 @@ export class UniqueKeySystemDatabase<Key extends string> extends BasicSystemData
       super.store(item);
     } else {
       if (overwrite) existingItem = item;
-      throw new Error(`Tried to store ${item}, but item already exists in DB ${this.name}. Try specifying overwrite flag.`)
+      else throw new Error(`Tried to store item with key ${item[this.primaryKey]}, but item already exists in DB ${this.name}. Try specifying overwrite flag.`)
     }
   }
 

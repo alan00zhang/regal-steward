@@ -19,6 +19,7 @@ import { CommandCrownAndAnchor } from '../commands/crown-and-anchor.js';
 import { UniqueSystemDatabase, BasicSystemDatabase } from './database.js';
 import { CommandBlackjack } from '../commands/blackjack.js';
 import { CasinoService } from '../services/casino-service.js';
+import { AudioService } from '../services/audio-service.js';
 
 export type UniqueItem<T>= {
   id: string,
@@ -31,6 +32,7 @@ export class System {
   Salary: SalaryService;
   Meme: MemeService;
   Casino: CasinoService;
+  Audio: AudioService;
   
   // Add your command to this list in order to activate your command
   private commandMapping: KeyValuePair<string, AppCommand> = {
@@ -50,6 +52,7 @@ export class System {
     this.Salary = new SalaryService(this);
     this.Meme = new MemeService(this);
     this.Casino = new CasinoService(this);
+    this.Audio = new AudioService(this);
   }
 
   getCommand(commandName: string) {
