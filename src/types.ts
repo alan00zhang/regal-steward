@@ -10,17 +10,15 @@ export type UserAccount = {
   salary: number;
   meme_earnings: number;
   [key: string]: any;
-}
+};
 
 export type AppCommand = {
-  execute: (interaction: ChatInputCommandInteraction, system: System) => any
-}
+  execute: (interaction: ChatInputCommandInteraction, system: System) => any;
+};
 
-export type KeyValuePair<Key extends string | number | symbol, T> = {
-  [key in Key]: T;
-}
-
-export type PrimaryKeyObject<Key extends string> = KeyValuePair<Key, any> & { [k: string]: any }
+export type PrimaryKeyObject<Key extends string> = {
+  [key in Key]: any;
+};
 
 export class EventOptions {
   name: string;
@@ -47,11 +45,35 @@ export type NumericRange<
   end extends number,
   arr extends unknown[] = [],
   acc extends number = never,
-> = arr['length'] extends end
+> = arr["length"] extends end
   ? acc | start | end
-  : NumericRange<start, end, [...arr, 1], arr[start] extends undefined ? acc : acc | arr['length']>;
+  : NumericRange<
+      start,
+      end,
+      [...arr, 1],
+      arr[start] extends undefined ? acc : acc | arr["length"]
+    >;
 
-export enum Suit { Diamonds, Clubs, Hearts, Spades }
-export enum CardNumber { Ace = 1, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King }
+export enum Suit {
+  Diamonds,
+  Clubs,
+  Hearts,
+  Spades,
+}
+export enum CardNumber {
+  Ace = 1,
+  Two,
+  Three,
+  Four,
+  Five,
+  Six,
+  Seven,
+  Eight,
+  Nine,
+  Ten,
+  Jack,
+  Queen,
+  King,
+}
 
-export type CasinoGame = "blackjack" | "roulette" | "poker"
+export type CasinoGame = "blackjack" | "roulette" | "poker";
