@@ -1,19 +1,24 @@
 import { SystemService } from "./service.js";
-import { AudioPlayer, StreamType, VoiceConnectionStatus, createAudioPlayer, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
+import { AudioPlayer, AudioResource, StreamType, VoiceConnectionStatus, createAudioPlayer, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import YTSR from "@distube/ytsr";
-import YTDL from "ytdl-core";
 import { Message } from "discord.js";
 import { UniqueKeySystemDatabase } from "../systems/database.js";
 import { AudioDownloader } from "../components/audio/audio-downloader.js";
+import { Subject } from "rxjs";
 
 export class AudioService extends SystemService {
   players: UniqueKeySystemDatabase<"guildId">;
+  queue: any[] = []
+  songEmitter = new Subject<AudioResource>();
   service(): void {
     this.players = new UniqueKeySystemDatabase("players", "guildId");
     this.listenToPlay();
     this.listenToPause();
     this.listenToStop();
     this.listenToLeave();
+    this.songEmitter.subscribe(song => {
+
+    })
   }
   listenToPlay() {
     this.system.client.on("messageCreate", message => {
@@ -87,6 +92,9 @@ export class AudioService extends SystemService {
     const audio = createAudioResource(song, {inlineVolume: false, inputType: StreamType.Opus});
     // audio.volume.setVolume(0.5)
     player.play(audio);
+  }
+  enqueue(song: AudioResource) {
+    this.queue.push(song);
   }
   teardown() {
     // iterate through connections and destroy all
