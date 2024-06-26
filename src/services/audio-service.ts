@@ -1,27 +1,32 @@
 import { SystemService } from "./service.js";
-import { AudioPlayer, AudioResource, StreamType, VoiceConnectionStatus, createAudioPlayer, createAudioResource, entersState, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
+import {
+  AudioPlayer,
+  AudioResource,
+  StreamType,
+  VoiceConnectionStatus,
+  createAudioPlayer,
+  createAudioResource,
+  entersState,
+  getVoiceConnection,
+  joinVoiceChannel,
+} from "@discordjs/voice";
 import YTSR from "@distube/ytsr";
 import { Message } from "discord.js";
 import { UniqueKeySystemDatabase } from "../systems/database.js";
 import { AudioDownloader } from "../components/audio/audio-downloader.js";
-import { Subject } from "rxjs";
+import { GuildAudioPlayer } from "../components/audio/guild-audio-player.js";
 
 export class AudioService extends SystemService {
-  players: UniqueKeySystemDatabase<"guildId">;
-  queue: any[] = []
-  songEmitter = new Subject<AudioResource>();
+  players: UniqueKeySystemDatabase<GuildAudioPlayer>;
   service(): void {
     this.players = new UniqueKeySystemDatabase("players", "guildId");
     this.listenToPlay();
     this.listenToPause();
     this.listenToStop();
     this.listenToLeave();
-    this.songEmitter.subscribe(song => {
-
-    })
   }
   listenToPlay() {
-    this.system.client.on("messageCreate", message => {
+    this.system.client.on("messageCreate", (message) => {
       if (message.content.startsWith("!play") && message.member.voice.channel?.id) {
         this.join(message);
         this.play(message);
@@ -29,7 +34,7 @@ export class AudioService extends SystemService {
     });
   }
   listenToPause() {
-    this.system.client.on("messageCreate", message => {
+    this.system.client.on("messageCreate", (message) => {
       if (message.content.startsWith("!pause")) {
         const player = this.players.getByID(message.guildId).player;
         player?.pause();
@@ -37,7 +42,7 @@ export class AudioService extends SystemService {
     });
   }
   listenToStop() {
-    this.system.client.on("messageCreate", message => {
+    this.system.client.on("messageCreate", (message) => {
       if (message.content.startsWith("!stop")) {
         const player = this.players.getByID(message.guildId).player;
         player?.stop();
@@ -45,7 +50,7 @@ export class AudioService extends SystemService {
     });
   }
   listenToLeave() {
-    this.system.client.on("messageCreate", message => {
+    this.system.client.on("messageCreate", (message) => {
       if (message.content.startsWith("!leave")) {
         let connection = getVoiceConnection(message.guildId);
         connection?.disconnect();
@@ -58,13 +63,13 @@ export class AudioService extends SystemService {
       guildId: message.guildId,
       channelId: message.member.voice.channel.id,
       adapterCreator: message.guild.voiceAdapterCreator,
-      selfDeaf: false
+      selfDeaf: false,
     });
     const player = this.players.getByID(message.guildId)?.player ?? createAudioPlayer();
     if (!this.players.has(message.guildId)) {
       connection.on(VoiceConnectionStatus.Disconnected, async () => {
         try {
-          await entersState(connection, VoiceConnectionStatus.Connecting, 5000)
+          await entersState(connection, VoiceConnectionStatus.Connecting, 5000);
         } catch {
           connection.destroy();
           player.stop();
@@ -72,30 +77,31 @@ export class AudioService extends SystemService {
         }
       });
     }
-    this.players.store({
-      guildId: message.guildId,
-      player: player,
-      connection: connection
-    }, true);
+    this.players.store(
+      {
+        guildId: message.guildId,
+        player: player,
+        connection: connection,
+      },
+      true,
+    );
   }
   play(message: Message) {
     const player: AudioPlayer = this.players.getByID(message.guildId).player;
     let connection = getVoiceConnection(message.guildId);
-    let songName = message.content.match(/^!play (.+)/)?.[1] // matches !play (some song name)
+    let songName = message.content.match(/^!play (.+)/)?.[1]; // matches !play (some song name)
     songName && this.startSong(songName, player);
     player.unpause();
     connection.subscribe(player);
   }
   async startSong(songName: string, player: AudioPlayer) {
     const videoResult = (await YTSR(songName + "official audio", { limit: 1 })).items[0];
-    const song = await AudioDownloader.download(videoResult.url)
-    const audio = createAudioResource(song, {inlineVolume: false, inputType: StreamType.Opus});
+    const song = await AudioDownloader.download(videoResult.url);
+    const audio = createAudioResource(song, { inlineVolume: false, inputType: StreamType.Opus });
     // audio.volume.setVolume(0.5)
     player.play(audio);
   }
-  enqueue(song: AudioResource) {
-    this.queue.push(song);
-  }
+  enqueue(song: AudioResource) {}
   teardown() {
     // iterate through connections and destroy all
   }

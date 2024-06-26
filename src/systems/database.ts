@@ -25,7 +25,7 @@ export class BasicSystemDatabase<T> extends AbstractSystemDatabase<T> {
   }
 
   public get(value: T): T {
-    return this._db.find(item => item === value);
+    return this._db.find((item) => item === value);
   }
 
   public store(item: T): void {
@@ -41,7 +41,7 @@ export class BasicSystemDatabase<T> extends AbstractSystemDatabase<T> {
   public deleteByIndex(index: number): void {
     try {
       this._db.splice(index, 1);
-    } catch(error) {
+    } catch (error) {
       console.warn(`Could not delete index ${index} in ${this.name} database!`);
     }
   }
@@ -63,35 +63,43 @@ export class UniqueSystemDatabase<T> extends BasicSystemDatabase<T> {
       super.store(item);
     } else {
       if (overwrite) existingItem = item;
-      else throw new Error(`Tried to store ${item}, but item already exists in DB ${this.name}. Try specifying overwrite flag.`)
+      else
+        throw new Error(
+          `Tried to store ${item}, but item already exists in DB ${this.name}. Try specifying overwrite flag.`,
+        );
     }
   }
 }
 
 // Unique database, uniqueness is based on item.key's value. There can be many similar items as long as item.key is different
-export class UniqueKeySystemDatabase<Key extends string> extends BasicSystemDatabase<PrimaryKeyObject<Key>> {
-  primaryKey: Key;
-  
-  constructor(name: string, key: Key) {
+export class UniqueKeySystemDatabase<T> extends BasicSystemDatabase<T> {
+  primaryKey: keyof T;
+
+  constructor(name: string, key: keyof T) {
     super(name);
     this.primaryKey = key;
   }
 
   getByID(pKeyValue: any) {
-    return this._db.find(item => item[this.primaryKey] === pKeyValue);
+    return this._db.find((item) => item[this.primaryKey] === pKeyValue);
   }
-  
+
   has(pKeyValue: any) {
     return this.getByID(pKeyValue) !== undefined;
   }
 
-  store(item: PrimaryKeyObject<Key>, overwrite?: boolean) {
+  store(item: T, overwrite?: boolean) {
     let existingItem = this.getByID(item[this.primaryKey]);
     if (!existingItem) {
       super.store(item);
     } else {
       if (overwrite) existingItem = item;
-      else throw new Error(`Tried to store item with key ${item[this.primaryKey]}, but item already exists in DB ${this.name}. Try specifying overwrite flag.`)
+      else
+        throw new Error(
+          `Tried to store item with key ${String(this.primaryKey)}: ${
+            item[this.primaryKey]
+          }, but item already exists in DB ${this.name}. Try specifying overwrite flag.`,
+        );
     }
   }
 
@@ -100,7 +108,7 @@ export class UniqueKeySystemDatabase<Key extends string> extends BasicSystemData
     if (index !== 1) {
       this.deleteByIndex(index);
     } else {
-      console.warn(`Could not delete item with value ${pKeyValue} in ${this.name} database!`)
+      console.warn(`Could not delete item with value ${pKeyValue} in ${this.name} database!`);
     }
   }
 }
