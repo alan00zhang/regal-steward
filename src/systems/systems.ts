@@ -1,30 +1,30 @@
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 import * as dotenv from "dotenv";
-dotenv.config({path: __dirname + '/.env'});
-import { ChatInputCommandInteraction, Client, Interaction, InteractionType, MessageComponentInteraction } from 'discord.js';
-import { SalaryService } from '../services/salary-service.js';
-import { MemeService } from '../services/meme-service.js';
-import { Bank } from './bank.js';
-import { CommandCrystalBall } from '../commands/magic-8-ball.js';
-import { CommandCheckBalance } from '../commands/check-balance.js';
-import { KeyValuePair, AppCommand, EventOptions, SingletonCommand } from '../types.js';
-import { CommandJackpot } from '../commands/jackpot.js';
-import { CommandCasinoLeaderboards } from '../commands/casino-leaderboards.js';
-import { CommandTip } from '../commands/tip.js';
-import { CommandCrownAndAnchor } from '../commands/crown-and-anchor.js';
-import { UniqueSystemDatabase, BasicSystemDatabase } from './database.js';
-import { CommandBlackjack } from '../commands/blackjack.js';
-import { CasinoService } from '../services/casino-service.js';
-import { AudioService } from '../services/audio-service.js';
+dotenv.config({ path: __dirname + "/.env" });
+import { ChatInputCommandInteraction, Client, MessageComponentInteraction } from "discord.js";
+import { SalaryService } from "../services/salary-service.js";
+import { MemeService } from "../services/meme-service.js";
+import { Bank } from "./bank.js";
+import { CommandCrystalBall } from "../commands/magic-8-ball.js";
+import { CommandCheckBalance } from "../commands/check-balance.js";
+import { AppCommand, EventOptions, SingletonCommand } from "../types.js";
+import { CommandJackpot } from "../commands/jackpot.js";
+import { CommandCasinoLeaderboards } from "../commands/casino-leaderboards.js";
+import { CommandTip } from "../commands/tip.js";
+import { CommandCrownAndAnchor } from "../commands/crown-and-anchor.js";
+import { UniqueSystemDatabase, BasicSystemDatabase } from "./database.js";
+import { CommandBlackjack } from "../commands/blackjack.js";
+import { CasinoService } from "../services/casino-service.js";
+import { AudioService } from "../services/audio-service.js";
 
-export type UniqueItem<T>= {
-  id: string,
-  value: T
-}
+export type UniqueItem<T> = {
+  id: string;
+  value: T;
+};
 export class System {
   bank: Bank;
   client: Client;
@@ -33,17 +33,17 @@ export class System {
   Meme: MemeService;
   Casino: CasinoService;
   Audio: AudioService;
-  
+
   // Add your command to this list in order to activate your command
-  private commandMapping: KeyValuePair<string, AppCommand> = {
-    'magic-8-ball': CommandCrystalBall,
-    'check-balance': CommandCheckBalance,
-    'jackpot': CommandJackpot,
-    'casino-leaderboards': CommandCasinoLeaderboards,
-    'tip': CommandTip,
-    'crown-and-anchor': CommandCrownAndAnchor,
-    'blackjack': CommandBlackjack
-  }
+  private commandMapping: Record<string, AppCommand> = {
+    "magic-8-ball": CommandCrystalBall,
+    "check-balance": CommandCheckBalance,
+    jackpot: CommandJackpot,
+    "casino-leaderboards": CommandCasinoLeaderboards,
+    tip: CommandTip,
+    "crown-and-anchor": CommandCrownAndAnchor,
+    blackjack: CommandBlackjack,
+  };
 
   constructor(client: Client) {
     this.dbActiveEvents = new UniqueSystemDatabase<string>("activeEvents");
@@ -64,7 +64,7 @@ export class System {
     if (this.dbActiveEvents.has(commandId)) {
       interaction.reply({
         content: `You can only have one /${interaction.commandName} command open at once.`,
-        ephemeral: true
+        ephemeral: true,
       });
       return false;
     } else {
@@ -87,9 +87,9 @@ export class System {
     } else {
       interaction.reply({
         content: "You are not worthy.",
-        ephemeral: true
-      })
-      return false;      
+        ephemeral: true,
+      });
+      return false;
     }
   }
 }
