@@ -20,6 +20,8 @@ import { UniqueSystemDatabase, BasicSystemDatabase } from "./database.js";
 import { CommandBlackjack } from "../commands/blackjack.js";
 import { CasinoService } from "../services/casino-service.js";
 import { AudioService } from "../services/audio-service.js";
+import { CommandMotivation } from "../commands/motivation.js";
+
 
 export type UniqueItem<T> = {
   id: string;
@@ -43,6 +45,7 @@ export class System {
     tip: CommandTip,
     "crown-and-anchor": CommandCrownAndAnchor,
     blackjack: CommandBlackjack,
+    "motivation": CommandMotivation,
   };
 
   constructor(client: Client) {
