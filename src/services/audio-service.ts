@@ -24,6 +24,7 @@ export class AudioService extends SystemService {
     this.listenToPause();
     this.listenToStop();
     this.listenToLeave();
+    this.listenToSkip();
   }
   listenToPlay() {
     this.system.client.on("messageCreate", (message) => {
@@ -36,7 +37,7 @@ export class AudioService extends SystemService {
   listenToPause() {
     this.system.client.on("messageCreate", (message) => {
       if (message.content.startsWith("!pause")) {
-        const player = this.players.getByID(message.guildId).player;
+        const player = this.players.getByID(message.guildId);
         player?.pause();
       }
     });
@@ -44,7 +45,7 @@ export class AudioService extends SystemService {
   listenToStop() {
     this.system.client.on("messageCreate", (message) => {
       if (message.content.startsWith("!stop")) {
-        const player = this.players.getByID(message.guildId).player;
+        const player = this.players.getByID(message.guildId);
         player?.stop();
       }
     });
@@ -55,6 +56,14 @@ export class AudioService extends SystemService {
         let connection = getVoiceConnection(message.guildId);
         connection?.disconnect();
         this.players.deleteByID(message.guildId);
+      }
+    });
+  }
+  listenToSkip() {
+    this.system.client.on("messageCreate", (message) => {
+      if (message.content.startsWith("!skip")) {
+        const player = this.players.getByID(message.guildId);
+        player?.skip();
       }
     });
   }
@@ -77,31 +86,26 @@ export class AudioService extends SystemService {
         }
       });
     }
-    this.players.store(
-      {
-        guildId: message.guildId,
-        player: player,
-        connection: connection,
-      },
-      true,
-    );
+    this.players.store(new GuildAudioPlayer(message.guildId, player, connection), true);
   }
-  play(message: Message) {
-    const player: AudioPlayer = this.players.getByID(message.guildId).player;
-    let connection = getVoiceConnection(message.guildId);
+  async play(message: Message) {
+    const player: GuildAudioPlayer = this.players.getByID(message.guildId);
+    const connection = getVoiceConnection(message.guildId);
     let songName = message.content.match(/^!play (.+)/)?.[1]; // matches !play (some song name)
-    songName && this.startSong(songName, player);
-    player.unpause();
-    connection.subscribe(player);
+    let song = await this.searchSong(songName);
+    player.play(song);
+    connection.subscribe(player.player);
   }
-  async startSong(songName: string, player: AudioPlayer) {
-    const videoResult = (await YTSR(songName + "official audio", { limit: 1 })).items[0];
-    const song = await AudioDownloader.download(videoResult.url);
-    const audio = createAudioResource(song, { inlineVolume: false, inputType: StreamType.Opus });
-    // audio.volume.setVolume(0.5)
-    player.play(audio);
+  async searchSong(songName?: string) {
+    if (songName) {
+      const videoResult = (await YTSR(songName + "official audio", { limit: 1 })).items[0];
+      const song = await AudioDownloader.download(videoResult.url);
+      const audio = createAudioResource(song, { inlineVolume: false, inputType: StreamType.Opus });
+      return audio;
+    } else {
+      return undefined;
+    }
   }
-  enqueue(song: AudioResource) {}
   teardown() {
     // iterate through connections and destroy all
   }

@@ -80,11 +80,11 @@ export class UniqueKeySystemDatabase<T> extends BasicSystemDatabase<T> {
     this.primaryKey = key;
   }
 
-  getByID(pKeyValue: any) {
+  getByID(pKeyValue: T[keyof T]) {
     return this._db.find((item) => item[this.primaryKey] === pKeyValue);
   }
 
-  has(pKeyValue: any) {
+  has(pKeyValue: T[keyof T]) {
     return this.getByID(pKeyValue) !== undefined;
   }
 
